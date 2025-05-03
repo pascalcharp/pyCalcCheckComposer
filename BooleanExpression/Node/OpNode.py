@@ -1,4 +1,4 @@
-from TerminalNode import TerminalNode
+from BooleanExpression.Node.TerminalNode import TerminalNode
 
 BooleanOperators = dict(Leftparen=" ( ",
                         Rightparen=" ( ",

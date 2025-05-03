@@ -1,4 +1,4 @@
-from TerminalNode import TerminalNode
+from BooleanExpression.Node.TerminalNode import TerminalNode
 
 class IdNode(TerminalNode):
 

@@ -1,13 +1,13 @@
-import Node.ENode
-import Node.IdNode
+
 from BooleanExpression.Node.ENode import ENode
 from BooleanExpression.Node.OpNode import OpNode
-import Node.NonTerminalNode
+from BooleanExpression.Node.IdNode import IdNode
 
 
-class BooleanExpression:
+
+class BooleanExpressionTree:
     def __init__(self):
-        self._root_node = Node.ENode.ENode()
+        self._root_node = ENode()
         self._nodes = {self._root_node.node_id: self._root_node}
 
     def get_root_id(self):
@@ -34,19 +34,19 @@ class BooleanExpression:
 
     def generate_id_production(self, node_id, name):
         node = self._nodes[node_id]
-        assert(isinstance(node, Node.ENode.ENode))
+        assert(isinstance(node, ENode))
         if node.has_children():
             raise Exception('Node {} may not be expanded'.format(node_id))
 
-        new_node = Node.IdNode.IdNode(name)
+        new_node = IdNode(name)
         node.add_children([new_node])
-        self._nodes.update({new_node.node_id, new_node})
+        self._nodes |= {new_node.node_id: new_node}
 
         return new_node.node_id
 
     def generate_binary_operator_production(self, node_id, op):
         node = self._nodes[node_id]
-        assert(isinstance(node, Node.ENode.ENode))
+        assert(isinstance(node, ENode))
         if node.has_children():
             raise Exception('Node {} may not be expanded'.format(node_id))
 
@@ -58,7 +58,7 @@ class BooleanExpression:
 
     def generate_unary_operator_production(self, node_id, op):
         node = self._nodes[node_id]
-        assert(isinstance(node, Node.ENode.ENode))
+        assert(isinstance(node, ENode))
         if node.has_children():
             raise Exception('Node {} may not be expanded'.format(node_id))
 
@@ -69,7 +69,7 @@ class BooleanExpression:
 
     def generate_parenthesis_production(self, node_id):
         node = self._nodes[node_id]
-        assert(isinstance(node, Node.ENode.ENode))
+        assert(isinstance(node, ENode))
         if node.has_children():
             raise Exception('Node {} may not be expanded'.format(node_id))
 
@@ -80,7 +80,7 @@ class BooleanExpression:
 
     def modify_id_name(self, node_id, name):
         node = self._nodes[node_id]
-        assert(isinstance(node, Node.IdNode.IdNode))
+        assert(isinstance(node, IdNode))
 
         node.substitute_lexeme(name)
 
@@ -89,7 +89,7 @@ class BooleanExpression:
             string_value += node.__str__()
         else:
             for child in node.get_children():
-                string_value += self.aux_build_output_string(child, string_value)
+                string_value = self.aux_build_output_string(child, string_value)
         return string_value
 
     def __str__(self):

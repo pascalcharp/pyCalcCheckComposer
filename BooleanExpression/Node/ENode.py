@@ -1,4 +1,4 @@
-from NonTerminalNode import NonTerminalNode
+from BooleanExpression.Node.NonTerminalNode import NonTerminalNode
 
 
 class ENode(NonTerminalNode):
