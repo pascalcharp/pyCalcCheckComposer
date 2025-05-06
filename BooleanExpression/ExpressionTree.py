@@ -92,5 +92,17 @@ class BooleanExpressionTree:
                 string_value = self.aux_build_output_string(child, string_value)
         return string_value
 
+    def aux_build_expression(self, node, expression):
+        if not node.has_children():
+            expression.append(node)
+        else:
+            for child in node.get_children():
+                self.aux_build_expression(child, expression)
+
+    def get_expression(self):
+        expression = []
+        self.aux_build_expression(self._root_node, expression)
+        return expression
+
     def __str__(self):
         return self.aux_build_output_string(self._root_node, "")
