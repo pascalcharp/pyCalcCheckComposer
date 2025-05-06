@@ -7,8 +7,10 @@ class NodeViewer(QPushButton):
     def __init__(self, node, parent=None):
         super().__init__(parent)
         self.parent = parent
-        self._configure()
         self._node = node
+
+        self._configure()
+
 
     def _onClicked(self):
         print("clicked")
@@ -16,6 +18,9 @@ class NodeViewer(QPushButton):
     def _configure(self):
         self.setFixedSize(NODE_VIEWER_SIZE, NODE_VIEWER_SIZE)
         self.setText(self._node.__str__())
+
+    def getNode(self):
+        return self._node
 
 
 
