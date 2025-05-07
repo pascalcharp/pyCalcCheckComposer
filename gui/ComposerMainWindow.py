@@ -12,7 +12,7 @@ class ComposerMainWindow(QMainWindow):
 
     def updateExpression(self, expression):
         self._viewer.updateNodes(expression)
-        self._viewer.refreshViewer()
+
 
     def configureActions(self):
         self._viewer.configureActions()

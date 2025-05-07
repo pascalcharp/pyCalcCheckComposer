@@ -12,7 +12,6 @@ class Composer:
 
     def startGui(self):
         self._updateExpression(self._expression.get_expression())
-        self._configureActions()
         self._mainWindow.show()
 
 

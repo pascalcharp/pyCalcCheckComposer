@@ -37,6 +37,8 @@ class ExpressionViewer(QWidget):
             self._nodeViewers.append(nodeViewer)
             self._layout.addWidget(nodeViewer)
 
+        self.configureActions()
+
 
     def configureActions(self):
         for nodeViewer in self._nodeViewers:
@@ -45,6 +47,7 @@ class ExpressionViewer(QWidget):
     def onNodeViewerClicked(self, node):
         assert(hasattr(self._parent, 'nodeViewerClicked') and callable(self._parent.nodeViewerClicked))
         self._parent.nodeViewerClicked(node, self)
+
 
 
 
