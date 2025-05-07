@@ -2,6 +2,7 @@ from PyQt6.QtGui import QWindow
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel, QListWidgetItem
 from gui.NodeViewerGenerator import NodeViewerGenerator
 
+# TODO Configurer adéquatement la reconnexion des évenements lorsque le display est rafraichi
 
 class ExpressionViewer(QWidget):
     def __init__(self, parent=None):
@@ -36,6 +37,7 @@ class ExpressionViewer(QWidget):
             self._nodeViewers.append(nodeViewer)
             self._layout.addWidget(nodeViewer)
 
+
     def configureActions(self):
         for nodeViewer in self._nodeViewers:
             nodeViewer.clicked.connect((lambda : self.onNodeViewerClicked(nodeViewer.getNode())))
@@ -43,6 +45,7 @@ class ExpressionViewer(QWidget):
     def onNodeViewerClicked(self, node):
         assert(hasattr(self._parent, 'nodeViewerClicked') and callable(self._parent.nodeViewerClicked))
         self._parent.nodeViewerClicked(node, self)
+
 
 
 
