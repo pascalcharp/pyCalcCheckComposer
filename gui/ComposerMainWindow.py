@@ -12,11 +12,11 @@ class ComposerMainWindow(QMainWindow):
 
     def updateExpression(self, expression):
         self._viewer.updateNodes(expression)
-        self._viewer.displayNodes()
+        self._viewer.refreshViewer()
 
     def configureActions(self):
         self._viewer.configureActions()
 
     def nodeViewerClicked(self, node, nodeViewer):
-        print(f"Node viewer clicked for node {node} on noce viewer {nodeViewer}")
+        self._composer.nodeViewerClicked(node, 0)
 

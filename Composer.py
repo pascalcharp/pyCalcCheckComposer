@@ -18,7 +18,7 @@ class Composer:
 
     def _configureActions(self):
         """
-        Demande à la fenêtre principale de connecter tous les éléments du wdget aux actions appropriées.
+        Demande à la fenêtre principale de connecter tous ses éléments aux actions appropriées.
         Returns:
             None
 
@@ -28,3 +28,8 @@ class Composer:
 
     def _updateExpression(self, expression):
         self._mainWindow.updateExpression(expression)
+
+    def nodeViewerClicked(self, node, expression_id):
+        self._expression.generate_id_production(node.node_id, "x")
+        self._updateExpression(self._expression.get_expression())
+

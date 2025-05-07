@@ -1,5 +1,5 @@
 from PyQt6.QtGui import QWindow
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel, QListWidgetItem
 from gui.NodeViewerGenerator import NodeViewerGenerator
 
 
@@ -17,10 +17,20 @@ class ExpressionViewer(QWidget):
         self.setGeometry(100, 100, 800, 600)
         self.setLayout(self._layout)
 
+    def _clearNodeViewers(self):
+        for viewer in self._nodeViewers:
+            viewer.hide()
+            viewer.deleteLater()
+        self._nodeViewers.clear()
+
+
     def updateNodes(self, nodes):
         self._nodes = nodes
 
-    def displayNodes(self):
+    def refreshViewer(self):
+        if self._nodeViewers:
+            self._clearNodeViewers()
+
         for node in self._nodes:
             nodeViewer = NodeViewerGenerator.getNodeViewer(node, self)
             self._nodeViewers.append(nodeViewer)
