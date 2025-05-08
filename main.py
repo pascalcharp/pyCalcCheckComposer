@@ -6,7 +6,7 @@ from gui.ComposerMainWindow import ComposerMainWindow
 
 def main():
     app = QApplication([])
-    composer = Composer()
+    _ = Composer()
     sys.exit(app.exec())
 
 if __name__ == '__main__':

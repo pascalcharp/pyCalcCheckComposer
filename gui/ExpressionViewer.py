@@ -27,6 +27,7 @@ class ExpressionViewer(QWidget):
 
     def updateNodes(self, nodes):
         self._nodes = nodes
+        self.refreshViewer()
 
     def refreshViewer(self):
         if self._nodeViewers:
