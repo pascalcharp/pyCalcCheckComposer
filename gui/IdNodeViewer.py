@@ -11,7 +11,7 @@ class IdNodeViewer(NodeViewer):
     def _configure(self):
         super()._configure()
 
-    def _onClicked(self):
-        super()._onClicked()
+    def onClicked(self):
+        super().onClicked()
         print("IdNodeViewer::_onClicked")
 

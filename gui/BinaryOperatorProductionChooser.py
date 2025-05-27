@@ -1,6 +1,9 @@
 import sys
 
+from functools import partial
+
 from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QPushButton, QApplication
+from PyQt6.QtCore import Qt
 
 from BooleanExpression.Node.OpNode import BooleanOperators
 
@@ -18,6 +21,7 @@ class BinaryOperatorProductionChooser(QWidget):
 
     def _configure(self):
         self._layout.addWidget(self._label, 0, 0, 1, 2)
+        self._label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         for key, loc in [
             ("AndOperator", (1, 0)),
             ("OrOperator", (1, 1)),
@@ -27,14 +31,20 @@ class BinaryOperatorProductionChooser(QWidget):
             ("NotEquivalentOperator", (3, 1))
         ]:
             self._buttons.update({key: QPushButton(key[0])})
-            self._buttons[key].setFixedSize(50, 50)
+            self._buttons[key].setFixedSize(100, 30)
             self._layout.addWidget(self._buttons[key], loc[0], loc[1])
-            self._buttons[key].clicked.connect(lambda : self._onButtonClicked(key))
         self.setLayout(self._layout)
+
+        # for key, button in self._buttons.items():
+        #     button.clicked.connect(partial(self._onButtonClicked, key))
+
+        for key, button in self._buttons.items():
+            button.clicked.connect(lambda checked, k=key: self._onButtonClicked(k))
 
     def _onButtonClicked(self, key):
         self._currentOperator = key
         self._label.setText(key[0])
+
 
     def getCurrentOperator(self):
         return self._currentOperator

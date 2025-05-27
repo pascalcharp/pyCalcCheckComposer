@@ -1,23 +1,26 @@
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QPushButton
+from PyQt6.QtWidgets import QPushButton, QWidget, QGridLayout, QVBoxLayout
 
 NODE_VIEWER_SIZE = 40
 
-class NodeViewer(QPushButton):
+class NodeViewer(QWidget):
     def __init__(self, node, parent=None):
         super().__init__(parent)
         self.parent = parent
         self._node = node
+        self._nodeButton = QPushButton()
+        self._layoutInactive = QVBoxLayout()
 
-        self._configure()
 
 
-    def _onClicked(self):
+    def onClicked(self):
         print("clicked")
 
     def _configure(self):
-        self.setFixedSize(NODE_VIEWER_SIZE, NODE_VIEWER_SIZE)
-        self.setText(self._node.__str__())
+        self._nodeButton.setFixedSize(NODE_VIEWER_SIZE, NODE_VIEWER_SIZE)
+        self._nodeButton.setText(self._node.__str__())
+        self._layoutInactive.addWidget(self._nodeButton)
+        self.setLayout(self._layoutInactive)
 
     def getNode(self):
         return self._node
