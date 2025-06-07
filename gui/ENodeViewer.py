@@ -13,26 +13,39 @@ class ENodeViewer(NodeViewer):
         assert(isinstance(enode, ENode))
         super().__init__(enode, parent)
 
-        self._layoutActive = QVBoxLayout()
-        self._productionButtons = [QPushButton() for _ in range(3)]
+        self._modes = ["inactive", "active"]
+        self._layouts = {"active": QVBoxLayout(), "inactive": QVBoxLayout()}
+
+        self._nodeButton = QPushButton(parent=self, text=self._node.__str__())
+        self._productionChooser = BinaryOperatorProductionChooser(parent=self)
 
         self._configure()
         self._configureActions()
 
 
+
     def _configure(self):
         super()._configure()
-        for button in self._productionButtons:
-            button.setText("Button")
-            self._layoutActive.addWidget(button)
+        self._nodeButton.setFixedSize(100, 20)
+        self._layouts["active"].addWidget(self._productionChooser)
+        self._layouts["inactive"].addWidget(self._nodeButton)
+        self.setLayout(self._layouts["inactive"])
+
+    def setMode(self, mode):
+        if mode in self._modes:
+            self.setLayout(self._layouts[mode])
+        else:
+            raise ValueError("Invalid mode")
+
 
     def _configureActions(self):
-        self._nodeButton.clicked.connect(self.onClicked)
+        #self._nodeButton.clicked.connect(self.onNodeButtonClicked)
+        pass
 
-    def onClicked(self):
+
+    def onNodeButtonClicked(self):
         super().onClicked()
-        self.
-        self.setLayout(self._layoutActive)
+        self.setMode("active")
 
 
 if __name__=="__main__":

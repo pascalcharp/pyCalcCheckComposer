@@ -1,7 +1,5 @@
 import sys
 
-from functools import partial
-
 from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QPushButton, QApplication
 from PyQt6.QtCore import Qt
 
@@ -34,9 +32,6 @@ class BinaryOperatorProductionChooser(QWidget):
             self._buttons[key].setFixedSize(100, 30)
             self._layout.addWidget(self._buttons[key], loc[0], loc[1])
         self.setLayout(self._layout)
-
-        # for key, button in self._buttons.items():
-        #     button.clicked.connect(partial(self._onButtonClicked, key))
 
         for key, button in self._buttons.items():
             button.clicked.connect(lambda checked, k=key: self._onButtonClicked(k))
