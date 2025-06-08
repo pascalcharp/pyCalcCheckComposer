@@ -1,20 +1,21 @@
 import sys
 
-from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QPushButton, QApplication
+from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QPushButton, QApplication, QDialog, QDialogButtonBox
 from PyQt6.QtCore import Qt
 
 from BooleanExpression.Node.OpNode import BooleanOperators
 
 
 
-class BinaryOperatorProductionChooser(QWidget):
+class BinaryOperatorProductionChooser(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self._currentOperator = None
         self._layout = QGridLayout()
         self._buttons = {}
         self._label = QLabel()
-
+        self._okButton = QPushButton("OK")
+        self._cancelButton = QPushButton("Cancel")
         self._configure()
 
     def _configure(self):
@@ -31,10 +32,17 @@ class BinaryOperatorProductionChooser(QWidget):
             self._buttons.update({key: QPushButton(key[0])})
             self._buttons[key].setFixedSize(100, 30)
             self._layout.addWidget(self._buttons[key], loc[0], loc[1])
+
+        self._layout.addWidget(self._okButton, 4, 0)
+        self._layout.addWidget(self._cancelButton, 4, 1)
         self.setLayout(self._layout)
 
         for key, button in self._buttons.items():
             button.clicked.connect(lambda checked, k=key: self._onButtonClicked(k))
+
+        self._okButton.clicked.connect(self.accept)
+        self._cancelButton.clicked.connect(self.reject)
+
 
     def _onButtonClicked(self, key):
         self._currentOperator = key
@@ -46,7 +54,16 @@ class BinaryOperatorProductionChooser(QWidget):
 
 if __name__ == "__main__":
     app = QApplication([])
-    BinaryOperatorProductionChooser().show()
+    result = BinaryOperatorProductionChooser().exec()
+    if result == QDialog.DialogCode.Accepted:
+        print("Accepted")
+        choice = BinaryOperatorProductionChooser().getCurrentOperator()
+        if choice is not None:
+            print(BinaryOperatorProductionChooser().getCurrentOperator())
+        else:
+            print("No choice")
+    else:
+        print("Cancelled")
     sys.exit(app.exec())
 
 
