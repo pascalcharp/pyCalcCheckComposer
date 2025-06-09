@@ -52,14 +52,19 @@ class BinaryOperatorProductionChooser(QDialog):
     def getCurrentOperator(self):
         return self._currentOperator
 
+    def close(self):
+        super().close()
+        self._currentOperator = None
+
 if __name__ == "__main__":
     app = QApplication([])
+    chooser = BinaryOperatorProductionChooser()
     result = BinaryOperatorProductionChooser().exec()
     if result == QDialog.DialogCode.Accepted:
         print("Accepted")
-        choice = BinaryOperatorProductionChooser().getCurrentOperator()
+        choice = chooser.getCurrentOperator()
         if choice is not None:
-            print(BinaryOperatorProductionChooser().getCurrentOperator())
+            print(choice)
         else:
             print("No choice")
     else:

@@ -1,6 +1,6 @@
 import sys
 
-from PyQt6.QtWidgets import QApplication, QVBoxLayout, QPushButton, QWidget, QStackedWidget
+from PyQt6.QtWidgets import QApplication, QVBoxLayout, QPushButton, QWidget, QStackedWidget, QDialog
 
 from BooleanExpression.Node.ENode import ENode
 from gui.BinaryOperatorProductionChooser import BinaryOperatorProductionChooser
@@ -8,45 +8,26 @@ from gui.NodeViewer import NodeViewer
 
 
 
-class ENodeViewer(QStackedWidget):
+class ENodeViewer(QWidget):
     def __init__(self, enode, parent=None):
         assert(isinstance(enode, ENode))
 
         super().__init__(parent)
         self._node = enode
 
-        self._modes = ["active", "inactive"]
-        self._currentMode = "inactive"
-
-        self._layouts = {"active": QVBoxLayout(), "inactive": QVBoxLayout()}
-        self._viewers = {"active": QWidget(self), "inactive": QWidget(self)}
-
-        self._nodeButton = QPushButton("E", self)
+        self._nodeButton = QPushButton(str(self._node), self)
         self._productionChooser = BinaryOperatorProductionChooser(self)
+        self._layout = QVBoxLayout()
 
         self._configure()
         self._configureActions()
-        self.setMode(self._currentMode)
 
 
 
     def _configure(self):
         self._nodeButton.setFixedSize(100, 30)
-
-        self._layouts["active"].addWidget(self._productionChooser)
-        self._viewers["active"].setLayout(self._layouts["active"])
-        self.addWidget(self._viewers["active"])
-
-        self._layouts["inactive"].addWidget(self._nodeButton)
-        self._viewers["inactive"].setLayout(self._layouts["inactive"])
-        self.addWidget(self._viewers["inactive"])
-
-    def setMode(self, mode):
-        if mode in self._modes:
-            self._currentMode = mode
-            self.setCurrentIndex(self._modes.index(mode))
-        else:
-            raise ValueError("Invalid mode")
+        self._layout.addWidget(self._nodeButton)
+        self.setLayout(self._layout)
 
 
     def _configureActions(self):
@@ -54,9 +35,12 @@ class ENodeViewer(QStackedWidget):
 
 
     def onNodeButtonClicked(self):
-        assert self._currentMode == "inactive"
-        self.setMode("active")
-
+        result = self._productionChooser.exec()
+        if result == QDialog.DialogCode.Accepted:
+            choice = self._productionChooser.getCurrentOperator()
+            if choice is not None:
+                print(choice)
+        self._productionChooser.close()
 
 if __name__=="__main__":
     app = QApplication([])
