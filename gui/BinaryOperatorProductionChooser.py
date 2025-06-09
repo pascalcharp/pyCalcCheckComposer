@@ -54,12 +54,13 @@ class BinaryOperatorProductionChooser(QDialog):
 
 if __name__ == "__main__":
     app = QApplication([])
-    result = BinaryOperatorProductionChooser().exec()
+    chooser = BinaryOperatorProductionChooser()
+    result = chooser.exec()
     if result == QDialog.DialogCode.Accepted:
         print("Accepted")
-        choice = BinaryOperatorProductionChooser().getCurrentOperator()
+        choice = chooser.getCurrentOperator()
         if choice is not None:
-            print(BinaryOperatorProductionChooser().getCurrentOperator())
+            print(choice)
         else:
             print("No choice")
     else:
