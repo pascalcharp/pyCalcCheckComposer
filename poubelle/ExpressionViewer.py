@@ -1,17 +1,20 @@
 from PyQt6.QtGui import QWindow
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel, QListWidgetItem
 from gui.NodeViewerGenerator import NodeViewerGenerator
+from BooleanExpression.ExpressionTree import BooleanExpressionTree
 
 
 
 class ExpressionViewer(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, expression_tree=None):
         super().__init__(parent)
         self._parent = parent
-        self._nodes = []
-        self._nodeViewers = []
+        if expression_tree is None:
+            self._tree = BooleanExpressionTree()
+        else:
+            self._tree = expression_tree
+        self.updateNodeViewers()
         self._layout = QHBoxLayout()
-
         self._configure()
 
     def _configure(self):
@@ -25,11 +28,12 @@ class ExpressionViewer(QWidget):
         self._nodeViewers.clear()
 
 
-    def updateNodes(self, nodes):
-        self._nodes = nodes
-        self.refreshViewer()
+    def updateNodeViewers(self):
+        self._nodes = self._tree.get_expression()
+        self._nodeViewers = [NodeViewerGenerator.getNodeViewer(node, self) for node in self._nodes]
 
-    def refreshViewer(self):
+
+def refreshViewer(self):
         if self._nodeViewers:
             self._clearNodeViewers()
 
