@@ -1,6 +1,9 @@
-from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget, QVBoxLayout, QPushButton, QScrollArea, QLabel
+from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget, QVBoxLayout, QPushButton, QScrollArea, QLabel, QFrame, \
+    QSpacerItem, QSizePolicy
 from PyQt6.QtCore import Qt
 from controllers.ProofController import ProofController
+from gui.ExpressionWidget import ExpressionWidget
+from gui.OperatorSelectionDialog import OperatorSelectionDialog
 
 
 class ProofWindow(QMainWindow):
@@ -20,6 +23,10 @@ class ProofWindow(QMainWindow):
         self.scroll_area = QScrollArea(self)
         self.scroll_area_widget = QWidget(self)
         self.layout = QVBoxLayout()
+        self.layout.setSpacing(10)
+        self.layout.setContentsMargins(10, 10, 10, 10)
+        self.spacer = QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.layout.addSpacerItem(self.spacer)
         self.scroll_area_widget.setLayout(self.layout)
         self.scroll_area.setWidget(self.scroll_area_widget)
         self.scroll_area.setWidgetResizable(True)
@@ -55,9 +62,27 @@ class ProofWindow(QMainWindow):
 
     def add_expression_widget(self, expression_widget):
         """
-        Ajoute un nouveau widget d'expression à la fenêtre.
+        Ajoute un widget d'expression encapsulé dans un QFrame pour délimiter visuellement.
         """
-        self.layout.addWidget(expression_widget)
+        # Créez un cadre (QFrame) pour encapsuler le widget
+        expression_frame = QFrame()
+        expression_frame.setLayout(QVBoxLayout())
+
+        # Ajoute le widget d'expression à l'intérieur du cadre
+        expression_frame.layout().addWidget(expression_widget)
+
+        # Applique un style personnalisé au cadre
+        expression_frame.setStyleSheet("""
+            QFrame {
+                border: 2px solid #4CAF50;  /* BORDURE - Couleur verte */
+                border-radius: 8px;         /* Coins arrondis */
+                background-color: #f9f9f9;  /* Fond léger */
+                margin: 10px;               /* Espace autour du rectangle */
+            }
+        """)
+
+        # Ajoute le cadre au layout principal de ProofWindow
+        self.layout.insertWidget(0, expression_frame)
 
     def update_expression_widget(self, expression_index):
         """
@@ -65,8 +90,11 @@ class ProofWindow(QMainWindow):
 
         :param expression_index: Index du widget dans le layout.
         """
-        widget = self.layout.itemAt(expression_index).widget()
-        widget.repaint()
+        frame = self.layout.itemAt(expression_index).widget()
+        assert isinstance(frame, QFrame)
+        widget = frame.layout().itemAt(0).widget()
+        assert isinstance(widget, ExpressionWidget)
+        widget.render_expression()
 
     def update_proof_display(self, expression_string):
         """
@@ -74,6 +102,17 @@ class ProofWindow(QMainWindow):
         """
         label = QLabel(expression_string)
         self.layout.addWidget(label)
+
+    def select_operator(self):
+        """
+        Affiche une boîte de dialogue permettant à l'utilisateur de choisir un opérateur.
+
+        :return: Le nom de l'opérateur sélectionné (str), ou None si l'utilisateur annule.
+        """
+        dialog = OperatorSelectionDialog(self)
+        if dialog.exec():  # Si l'utilisateur clique sur OK
+            return dialog.get_selected_operator()
+        return None  # Retourne None si la boîte est annulée
 
 
 if __name__ == "__main__":

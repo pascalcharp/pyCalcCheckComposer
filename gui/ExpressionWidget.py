@@ -1,6 +1,8 @@
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QMessageBox
 from PyQt6.QtCore import Qt
 
+from BooleanExpression.Node.OpNode import OpNode
+from gui.ExpandNodeDialog import ExpandNodeDialog
 from gui.NodeButton import NodeButton
 
 class ExpressionWidget(QWidget):
@@ -31,6 +33,7 @@ class ExpressionWidget(QWidget):
         Reconstruit l'affichage graphique de l'arbre logique dans ce widget,
         chaque noeud est disposé horizontalement.
         """
+        print("DEBUG: Rendu de l'expression :", self.tree)
         # Nettoyer les nodes existants (avant affichage ou modification)
         for i in reversed(range(self.node_layout.count())):
             self.node_layout.itemAt(i).widget().deleteLater()
@@ -40,8 +43,8 @@ class ExpressionWidget(QWidget):
 
         # Ajouter chaque noeud à la disposition horizontale
         for node in expression_nodes:
-            if isinstance(node, str):  # Si le node est un opérateur ou une parenthèse
-                button = QPushButton(node)
+            if isinstance(node, OpNode):  # Si le node est un opérateur ou une parenthèse
+                button = QPushButton(node.__str__())
                 button.setFixedSize(40, 40)
                 button.setEnabled(False)  # Non cliquable
             else:  # Si c'est un Enode
@@ -55,23 +58,17 @@ class ExpressionWidget(QWidget):
 
     def display_popup_to_expand(self, node_id):
         """
-        Affiche une fenêtre de dialogue pour demander l'expansion d'un noeud spécifique.
-
-        :param node_id: ID du noeud à modifier.
+        Affiche une boîte de dialogue pour choisir un opérateur pour étendre un ENode.
         """
-        result = QMessageBox.question(
-            self,
-            "Expansion du nœud",
-            "Voulez-vous expandre ce nœud en 'E AND E' ?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-        )
-
-        if result == QMessageBox.StandardButton.Yes:
-            # Notifier le contrôleur pour effectuer l'expansion
-            self.proof_window.controller.expand_node(self.expression_index, node_id)
-
-            # Rafraîchir l'affichage après modification
-            self.render_expression()
+        dialog = ExpandNodeDialog(self)
+        if dialog.exec():  # Si l'utilisateur sélectionne un opérateur
+            selected_operator = dialog.get_selected_operator()
+            print(f"DEBUG: Opérateur choisi : {selected_operator}")
+            if selected_operator:
+                # Appeler la méthode du contrôleur pour gérer l'expansion
+                self.proof_window.controller.expand_node(self.expression_index, node_id, selected_operator)
+        else:
+            print("Expansion de nœud annulée par l'utilisateur.")
 
     def modify_expression(self):
         """
