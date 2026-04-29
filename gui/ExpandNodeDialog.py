@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QGridLayout, QPushButton, QLabel, QHBoxLayout
 )
 from PyQt6.QtCore import Qt
+from BooleanExpression.Node.OpNode import BooleanOperators
 
 
 class ExpandNodeDialog(QDialog):
@@ -29,18 +30,21 @@ class ExpandNodeDialog(QDialog):
         grid_layout = QGridLayout()
 
         # Opérateurs à afficher (provenant de OpNode.BooleanOperators)
-        self.operators = [
-            "AndOperator", "OrOperator", "XorOperator",
-            "ImplicationOperator", "ConsequenceOperator",
-            "EquivalentOperator", "NotEquivalentOperator"
-        ]
+        self.operators = BooleanOperators.keys()
 
         # Dictionnaire pour stocker la correspondance des boutons
         self.selected_operator = None  # Stockera l'opérateur choisi
 
         # Ajouter les boutons pour chaque opérateur
         for i, operator in enumerate(self.operators):
-            button = QPushButton(operator)  # Texte du bouton = clé de l'opérateur
+            symbol = BooleanOperators[operator]
+            if operator == "NotOperator":
+                button_label = f"{symbol.strip()} E"
+            elif operator in ["Leftparen", "Rightparen"]:
+                button_label = symbol.strip()
+            else:
+                button_label = f"E {symbol.strip()} E"
+            button = QPushButton(button_label)  # Texte du bouton = clé de l'opérateur
             button.setFixedSize(100, 40)
             button.clicked.connect(lambda _, op=operator: self._on_operator_selected(op))
             grid_layout.addWidget(button, i // 3, i % 3)  # 3 colonnes dans la grille

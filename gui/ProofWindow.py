@@ -7,6 +7,33 @@ from gui.OperatorSelectionDialog import OperatorSelectionDialog
 
 
 class ProofWindow(QMainWindow):
+
+    # Constantes
+    INITIAL_WINDOW_WIDTH_RATIO = 3
+    INITIAL_WINDOW_HEIGHT_RATIO = 3
+    MINIMUM_WINDOW_WIDTH = 600
+    MINIMUM_WINDOW_HEIGHT = 400
+
+    LAYOUT_SPACING = 10
+    LAYOUT_MARGINS = (10, 10, 10, 10)
+
+    SPACER_WIDTH = 20
+    SPACER_HEIGHT = 20
+    SPACER_HORIZONTAL_POLICY = QSizePolicy.Policy.Minimum
+    SPACER_VERTICAL_POLICY = QSizePolicy.Policy.Expanding
+
+    COLOR_BORDER = "#4CAF50"
+    COLOR_BACKGROUND = "#f9f9f9"
+
+    EXPRESSION_FRAME_STYLE_TEMPLATE = """
+            QFrame {{
+                border: 2px solid {border_color};  /* Couleur des bordures */
+                border-radius: 8px;              /* Coins arrondis */
+                background-color: {background_color};  /* Couleur de fond */
+                margin: 10px;                    /* Espace autour du rectangle */
+            }}
+        """
+
     def __init__(self):
         super().__init__()
 
@@ -23,9 +50,9 @@ class ProofWindow(QMainWindow):
         self.scroll_area = QScrollArea(self)
         self.scroll_area_widget = QWidget(self)
         self.layout = QVBoxLayout()
-        self.layout.setSpacing(10)
-        self.layout.setContentsMargins(10, 10, 10, 10)
-        self.spacer = QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.layout.setSpacing(self.LAYOUT_SPACING)
+        self.layout.setContentsMargins(*self.LAYOUT_MARGINS)
+        self.spacer = QSpacerItem(self.SPACER_WIDTH, self.SPACER_HEIGHT, self.SPACER_HORIZONTAL_POLICY, self.SPACER_VERTICAL_POLICY)
         self.layout.addSpacerItem(self.spacer)
         self.scroll_area_widget.setLayout(self.layout)
         self.scroll_area.setWidget(self.scroll_area_widget)
@@ -55,10 +82,10 @@ class ProofWindow(QMainWindow):
         # Fixer la taille à un tiers de la largeur et de la hauteur de l'écran
         screen_width = screen_geometry.width()
         screen_height = screen_geometry.height()
-        self.resize(screen_width // 3, screen_height // 3)
+        self.resize(screen_width // self.INITIAL_WINDOW_WIDTH_RATIO, screen_height // self.INITIAL_WINDOW_HEIGHT_RATIO)
 
         # Fixer une taille minimale par précaution
-        self.setMinimumSize(600, 400)
+        self.setMinimumSize(self.MINIMUM_WINDOW_WIDTH, self.MINIMUM_WINDOW_HEIGHT)
 
     def add_expression_widget(self, expression_widget):
         """
@@ -71,15 +98,14 @@ class ProofWindow(QMainWindow):
         # Ajoute le widget d'expression à l'intérieur du cadre
         expression_frame.layout().addWidget(expression_widget)
 
-        # Applique un style personnalisé au cadre
-        expression_frame.setStyleSheet("""
-            QFrame {
-                border: 2px solid #4CAF50;  /* BORDURE - Couleur verte */
-                border-radius: 8px;         /* Coins arrondis */
-                background-color: #f9f9f9;  /* Fond léger */
-                margin: 10px;               /* Espace autour du rectangle */
-            }
-        """)
+        # Génère le CSS personnalisé
+        expression_frame_style = self.EXPRESSION_FRAME_STYLE_TEMPLATE.format(
+            border_color=self.COLOR_BORDER,
+            background_color=self.COLOR_BACKGROUND
+        )
+
+        # Applique le style généré
+        expression_frame.setStyleSheet(expression_frame_style)
 
         # Ajoute le cadre au layout principal de ProofWindow
         self.layout.insertWidget(0, expression_frame)
