@@ -38,7 +38,7 @@ class ExpandNodeDialog(QDialog):
             if operator == "NotOperator":
                 button_label = f"{symbol.strip()} E"
             elif operator in ["Leftparen", "Rightparen"]:
-                button_label = symbol.strip()
+                continue
             else:
                 button_label = f"E {symbol.strip()} E"
             button = QPushButton(button_label)  # Texte du bouton = clé de l'opérateur
@@ -46,6 +46,12 @@ class ExpandNodeDialog(QDialog):
             button.clicked.connect(lambda _, op=operator: self._on_operator_selected(op))
             grid_layout.addWidget(button, i // GuiConstants.GRID_COLUMNS, i % GuiConstants.GRID_COLUMNS)  # 3 colonnes dans la grille
 
+        paren_button = QPushButton("(E)")
+        paren_button.setFixedSize(GuiConstants.BUTTON_WIDTH, GuiConstants.BUTTON_HEIGHT)
+        paren_button.clicked.connect(
+            lambda: self._on_operator_selected("Leftparen")
+        )
+        grid_layout.addWidget(paren_button)
         main_layout.addLayout(grid_layout)
 
         # Ajout d'un bouton "Annuler"
