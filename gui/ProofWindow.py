@@ -85,7 +85,9 @@ class ProofWindow(QMainWindow):
         expression_frame.setStyleSheet(expression_frame_style)
 
         # Ajoute le cadre au layout principal de ProofWindow
-        self.layout.insertWidget(0, expression_frame)
+        insert_index = self.layout.count() - 1
+        self.layout.insertWidget(insert_index, expression_frame)
+
 
     def update_expression_widget(self, expression_index):
         """

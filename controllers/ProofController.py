@@ -47,7 +47,7 @@ class ProofController:
             elif operator == "Leftparen" or operator == "Rightparen":
                 expression_tree.generate_parenthesis_production(node_id)
             else:
-                raise ValueError(f"Opéateur invalide : {operator}")
+                raise ValueError(f"Opérateur invalide : {operator}")
 
             # Rafraîchir l'affichage
             self.proof_window.update_expression_widget(expression_index)

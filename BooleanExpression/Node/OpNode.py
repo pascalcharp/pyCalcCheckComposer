@@ -1,7 +1,7 @@
 from BooleanExpression.Node.TerminalNode import TerminalNode
 
 BooleanOperators = dict(Leftparen=" ( ",
-                        Rightparen=" ( ",
+                        Rightparen=" ) ",
                         NotOperator=" not ",
                         AndOperator=" and ",
                         OrOperator=" or ",
