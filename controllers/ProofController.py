@@ -39,12 +39,18 @@ class ProofController:
         """
         expression_tree = self.proofs[expression_index]
 
-        try:
-            # Étendre le nœud avec l'opérateur sélectionné
-            expression_tree.generate_binary_operator_production(node_id, operator)
+        try:# Étendre le nœud avec l'opérateur sélectionné
+            if operator == "NotOperator":
+                expression_tree.generate_unary_operator_production(node_id, operator)
+            elif operator == "AndOperator" or operator == "OrOperator":
+                expression_tree.generate_binary_operator_production(node_id, operator)
+            elif operator == "Leftparen" or operator == "Rightparen":
+                expression_tree.generate_parenthesis_production(node_id)
+            else:
+                raise ValueError(f"Opéateur invalide : {operator}")
 
             # Rafraîchir l'affichage
             self.proof_window.update_expression_widget(expression_index)
 
         except Exception as e:
-            QMessageBox.critical(self.proof_window, "Erreur", f"Impossible d'expandre le nœud : {e}")
+            self.proof_window.display_error_message(str(e))

@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 from BooleanExpression.Node.OpNode import BooleanOperators
+from gui.GuiConstants import GuiConstants
 
 
 class ExpandNodeDialog(QDialog):
@@ -15,16 +16,12 @@ class ExpandNodeDialog(QDialog):
         super().__init__(parent)
 
         # Configuration de base
-        self.setWindowTitle("Sélectionner un opérateur")
-        self.setMinimumSize(400, 300)
+        self.setWindowTitle(GuiConstants.DIALOG_TITLE)
+        self.setMinimumSize(GuiConstants.DIALOG_MIN_WIDTH, GuiConstants.DIALOG_MIN_HEIGHT)
+        self.setWindowOpacity(0.5)
 
         # Layout principal (Vertical)
         main_layout = QVBoxLayout()
-
-        # Ajout d'un label explicatif
-        label = QLabel("Choisissez un opérateur pour étendre le noeud :")
-        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        main_layout.addWidget(label)
 
         # Grille pour les opérateurs
         grid_layout = QGridLayout()
@@ -45,14 +42,14 @@ class ExpandNodeDialog(QDialog):
             else:
                 button_label = f"E {symbol.strip()} E"
             button = QPushButton(button_label)  # Texte du bouton = clé de l'opérateur
-            button.setFixedSize(100, 40)
+            button.setFixedSize(GuiConstants.BUTTON_WIDTH, GuiConstants.BUTTON_HEIGHT)
             button.clicked.connect(lambda _, op=operator: self._on_operator_selected(op))
-            grid_layout.addWidget(button, i // 3, i % 3)  # 3 colonnes dans la grille
+            grid_layout.addWidget(button, i // GuiConstants.GRID_COLUMNS, i % GuiConstants.GRID_COLUMNS)  # 3 colonnes dans la grille
 
         main_layout.addLayout(grid_layout)
 
         # Ajout d'un bouton "Annuler"
-        cancel_button = QPushButton("Annuler")
+        cancel_button = QPushButton(GuiConstants.CANCEL_BUTTON_TEXT)
         cancel_button.clicked.connect(self.reject)  # Ferme la boîte sans rien retourner
 
         # Centrage du bouton "Annuler" sous la grille

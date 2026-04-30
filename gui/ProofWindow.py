@@ -1,44 +1,18 @@
 from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget, QVBoxLayout, QPushButton, QScrollArea, QLabel, QFrame, \
-    QSpacerItem, QSizePolicy
+    QSpacerItem, QSizePolicy, QMessageBox
 from PyQt6.QtCore import Qt
 from controllers.ProofController import ProofController
 from gui.ExpressionWidget import ExpressionWidget
-from gui.OperatorSelectionDialog import OperatorSelectionDialog
+from gui.GuiConstants import GuiConstants
 
 
 class ProofWindow(QMainWindow):
-
-    # Constantes
-    INITIAL_WINDOW_WIDTH_RATIO = 3
-    INITIAL_WINDOW_HEIGHT_RATIO = 3
-    MINIMUM_WINDOW_WIDTH = 600
-    MINIMUM_WINDOW_HEIGHT = 400
-
-    LAYOUT_SPACING = 10
-    LAYOUT_MARGINS = (10, 10, 10, 10)
-
-    SPACER_WIDTH = 20
-    SPACER_HEIGHT = 20
-    SPACER_HORIZONTAL_POLICY = QSizePolicy.Policy.Minimum
-    SPACER_VERTICAL_POLICY = QSizePolicy.Policy.Expanding
-
-    COLOR_BORDER = "#4CAF50"
-    COLOR_BACKGROUND = "#f9f9f9"
-
-    EXPRESSION_FRAME_STYLE_TEMPLATE = """
-            QFrame {{
-                border: 2px solid {border_color};  /* Couleur des bordures */
-                border-radius: 8px;              /* Coins arrondis */
-                background-color: {background_color};  /* Couleur de fond */
-                margin: 10px;                    /* Espace autour du rectangle */
-            }}
-        """
 
     def __init__(self):
         super().__init__()
 
         # Titre de la fenêtre
-        self.setWindowTitle("Preuve GUI")
+        self.setWindowTitle(GuiConstants.MAIN_WINDOW_TITLE)
 
         # Initialiser le contrôleur
         self.controller = ProofController(self)
@@ -50,16 +24,19 @@ class ProofWindow(QMainWindow):
         self.scroll_area = QScrollArea(self)
         self.scroll_area_widget = QWidget(self)
         self.layout = QVBoxLayout()
-        self.layout.setSpacing(self.LAYOUT_SPACING)
-        self.layout.setContentsMargins(*self.LAYOUT_MARGINS)
-        self.spacer = QSpacerItem(self.SPACER_WIDTH, self.SPACER_HEIGHT, self.SPACER_HORIZONTAL_POLICY, self.SPACER_VERTICAL_POLICY)
+        self.layout.setSpacing(GuiConstants.LAYOUT_SPACING)
+        self.layout.setContentsMargins(*GuiConstants.LAYOUT_MARGINS)
+        self.spacer = QSpacerItem(GuiConstants.SPACER_WIDTH,
+                                  GuiConstants.SPACER_HEIGHT,
+                                  QSizePolicy.Policy.Minimum,
+                                  QSizePolicy.Policy.Expanding)
         self.layout.addSpacerItem(self.spacer)
         self.scroll_area_widget.setLayout(self.layout)
         self.scroll_area.setWidget(self.scroll_area_widget)
         self.scroll_area.setWidgetResizable(True)
 
         # Bouton pour ajouter une nouvelle expression
-        self.add_expression_button = QPushButton("Ajouter une nouvelle expression")
+        self.add_expression_button = QPushButton(GuiConstants.ADD_EXPRESSION_BUTTON_TEXT)
         self.add_expression_button.clicked.connect(self.controller.add_new_expression)
 
         # Layout principal
@@ -82,10 +59,10 @@ class ProofWindow(QMainWindow):
         # Fixer la taille à un tiers de la largeur et de la hauteur de l'écran
         screen_width = screen_geometry.width()
         screen_height = screen_geometry.height()
-        self.resize(screen_width // self.INITIAL_WINDOW_WIDTH_RATIO, screen_height // self.INITIAL_WINDOW_HEIGHT_RATIO)
+        self.resize(screen_width // GuiConstants.INITIAL_WINDOW_WIDTH_RATIO, screen_height // GuiConstants.INITIAL_WINDOW_HEIGHT_RATIO)
 
         # Fixer une taille minimale par précaution
-        self.setMinimumSize(self.MINIMUM_WINDOW_WIDTH, self.MINIMUM_WINDOW_HEIGHT)
+        self.setMinimumSize(GuiConstants.MINIMUM_WINDOW_WIDTH, GuiConstants.MINIMUM_WINDOW_HEIGHT)
 
     def add_expression_widget(self, expression_widget):
         """
@@ -99,9 +76,9 @@ class ProofWindow(QMainWindow):
         expression_frame.layout().addWidget(expression_widget)
 
         # Génère le CSS personnalisé
-        expression_frame_style = self.EXPRESSION_FRAME_STYLE_TEMPLATE.format(
-            border_color=self.COLOR_BORDER,
-            background_color=self.COLOR_BACKGROUND
+        expression_frame_style = GuiConstants.EXPRESSION_FRAME_STYLE_TEMPLATE.format(
+            border_color=GuiConstants.COLOR_BORDER,
+            background_color=GuiConstants.COLOR_BACKGROUND
         )
 
         # Applique le style généré
@@ -129,16 +106,10 @@ class ProofWindow(QMainWindow):
         label = QLabel(expression_string)
         self.layout.addWidget(label)
 
-    def select_operator(self):
-        """
-        Affiche une boîte de dialogue permettant à l'utilisateur de choisir un opérateur.
+    def display_error_message(self, message):
+        QMessageBox.critical(self, "Erreur", message)
 
-        :return: Le nom de l'opérateur sélectionné (str), ou None si l'utilisateur annule.
-        """
-        dialog = OperatorSelectionDialog(self)
-        if dialog.exec():  # Si l'utilisateur clique sur OK
-            return dialog.get_selected_operator()
-        return None  # Retourne None si la boîte est annulée
+
 
 
 if __name__ == "__main__":

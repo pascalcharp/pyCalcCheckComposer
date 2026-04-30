@@ -3,6 +3,7 @@ from PyQt6.QtCore import Qt
 
 from BooleanExpression.Node.OpNode import OpNode
 from gui.ExpandNodeDialog import ExpandNodeDialog
+from gui.GuiConstants import GuiConstants
 from gui.NodeButton import NodeButton
 
 class ExpressionWidget(QWidget):
@@ -45,14 +46,25 @@ class ExpressionWidget(QWidget):
         for node in expression_nodes:
             if isinstance(node, OpNode):  # Si le node est un opérateur ou une parenthèse
                 button = QPushButton(node.__str__())
-                button.setFixedSize(40, 40)
+                button.setFixedSize(GuiConstants.BUTTON_OPERATOR_WIDTH, GuiConstants.BUTTON_OPERATOR_HEIGHT)
                 button.setEnabled(False)  # Non cliquable
-            else:  # Si c'est un Enode
-                button = NodeButton(
-                    node_id=node.node_id,
-                    text="E",  # Texte affiché pour chaque Enode
-                    on_click=self.display_popup_to_expand  # Action effectuée si on clique dessus
+
+                # Générer dynamiquement le style pour les NodeButtons
+                button.setStyleSheet(
+                    GuiConstants.STYLE_BUTTON_NODE_TEMPLATE.format(
+                        background_color=GuiConstants.COLOR_NODE_BUTTON_BACKGROUND,
+                        text_color=GuiConstants.COLOR_NODE_BUTTON_TEXT,
+                        border_color=GuiConstants.COLOR_NODE_BUTTON_BORDER,
+                        hover_color=GuiConstants.COLOR_NODE_BUTTON_HOVER
+                    )
                 )
+
+            else:  # Si c'est un Enode
+                    button = NodeButton(
+                        node_id=node.node_id,
+                        text=GuiConstants.NODE_BUTTON_TEXT,  # Texte affiché pour chaque Enode
+                        on_click=self.display_popup_to_expand  # Action effectuée si on clique dessus
+                    )
 
             self.node_layout.addWidget(button, alignment=Qt.AlignmentFlag.AlignCenter)
 
