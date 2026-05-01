@@ -72,7 +72,20 @@ class ExpressionWidget(QWidget):
         """
         Affiche une boîte de dialogue pour choisir un opérateur pour étendre un ENode.
         """
+        sender_button = self.sender()
+        assert isinstance(sender_button, (QPushButton, NodeButton))
+        button_position = sender_button.mapToGlobal(
+            sender_button.rect().bottomLeft()
+        )
         dialog = ExpandNodeDialog(self)
+        button_width = sender_button.width()
+        dialog_width = dialog.sizeHint().width()
+
+        centered_x = button_position.x() + (button_width - dialog_width) / 2
+        height_offset = dialog.frameGeometry().height() - dialog.geometry().height()
+        centered_y = button_position.y() - height_offset
+        dialog.move(round(centered_x), centered_y)
+
         if dialog.exec():  # Si l'utilisateur sélectionne un opérateur
             selected_operator = dialog.get_selected_operator()
             print(f"DEBUG: Opérateur choisi : {selected_operator}")
