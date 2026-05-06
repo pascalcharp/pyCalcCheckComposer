@@ -1,5 +1,25 @@
 # Journal de développement — pyCalcCheckComposer
 
+## Centralisation des constantes GUI *(2026-05-05)*
+
+**Objectif :** Éliminer toutes les valeurs numériques codées en dur dans les widgets ; préparer la migration vers une configuration JSON.
+
+### Constantes ajoutées dans `gui/GuiConstants.py`
+
+| Constante | Valeur | Sémantique |
+|---|---|---|
+| `ENODE_DISPLAY_BUTTON_SIZE` | 40 | Taille du bouton `?` carré (ENodeWidget) |
+| `NODE_DISPLAY_BUTTON_HEIGHT` | 40 | Hauteur des boutons Display (OpNodeWidget, IdNodeWidget) |
+| `NODE_INPUT_BUTTON_HEIGHT` | 35 | Hauteur de tous les boutons en mode Input |
+| `NODE_ACTION_BUTTON_WIDTH` | 30 | Largeur des petits boutons `✓` `→` `✕` |
+| `NODE_TEXT_INPUT_WIDTH` | 80 | Largeur des champs texte (variable, nom) |
+| `NODE_INPUT_LAYOUT_SPACING` | 4 | Espacement du layout en mode Input |
+
+### Fichiers mis à jour
+- `gui/ENodeWidget.py`, `gui/OpNodeWidget.py`, `gui/IdNodeWidget.py` — plus aucune valeur numérique littérale dans les appels `setFixedSize/Height/Width` et `setSpacing`.
+
+---
+
 ## Correctif sizing `NodeWidget` *(2026-05-05)*
 
 **Problème :** En mode Display, les NodeWidgets occupaient la largeur du mode Input (QStackedWidget impose le max de toutes ses pages). Première tentative de correction via `sizeHint()` + size policy → régression inverse : seul le quart supérieur gauche des boutons était visible (conflit entre le `setFixedSize` des boutons et la taille imposée par le layout interne).
