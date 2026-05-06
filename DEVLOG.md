@@ -1,5 +1,19 @@
 # Journal de développement — pyCalcCheckComposer
 
+## Correctif sizing `NodeWidget` *(2026-05-05)*
+
+**Problème :** En mode Display, les NodeWidgets occupaient la largeur du mode Input (QStackedWidget impose le max de toutes ses pages). Première tentative de correction via `sizeHint()` + size policy → régression inverse : seul le quart supérieur gauche des boutons était visible (conflit entre le `setFixedSize` des boutons et la taille imposée par le layout interne).
+
+**Solution :** Suppression du `QStackedWidget`. Les deux widgets (Display et Input) coexistent dans un `QHBoxLayout` ; le widget inactif est caché (`hide()`) **et** marqué `Ignored` pour ne pas influencer la taille du layout. `updateGeometry()` propage le changement au parent. Un flag `_is_in_input_mode` remplace le check `currentWidget()`.
+
+### Fichier modifié
+#### `gui/NodeWidget.py`
+- Remplacement de `QStackedWidget` par `QHBoxLayout` + show/hide + `setSizePolicy(Ignored)`.
+- Ajout de `_is_in_input_mode` (bool) comme source de vérité pour `is_in_input_mode()`.
+- Suppression des overrides `sizeHint()` / `minimumSizeHint()` (devenus inutiles).
+
+---
+
 ## Étape 8 — Nettoyage *(2026-05-05)*
 
 **Objectif :** Supprimer tout le code devenu mort après les étapes précédentes.

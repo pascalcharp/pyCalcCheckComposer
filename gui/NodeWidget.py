@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QStackedWidget, QVBoxLayout
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QSizePolicy
 from PyQt6.QtCore import pyqtSignal
 
 
@@ -14,6 +14,10 @@ class NodeWidget(QWidget):
     Les sous-classes implémentent _build_display_widget() et _build_input_widget().
     ExpressionWidget écoute input_mode_requested pour garantir qu'un seul nœud
     est en mode Input à la fois.
+
+    Implémentation : les deux widgets coexistent dans le même QHBoxLayout.
+    Celui qui est inactif est caché ET marqué Ignored pour ne pas influencer
+    la taille du layout. updateGeometry() propage le changement au parent.
     """
 
     input_mode_requested = pyqtSignal(object)   # payload : self
@@ -22,16 +26,20 @@ class NodeWidget(QWidget):
     def __init__(self, node_id):
         super().__init__()
         self.node_id = node_id
+        self._is_in_input_mode = False
 
-        self._stack = QStackedWidget()
         self._display_widget = self._build_display_widget()
         self._input_widget = self._build_input_widget()
-        self._stack.addWidget(self._display_widget)
-        self._stack.addWidget(self._input_widget)
 
-        layout = QVBoxLayout()
+        # Le widget Input démarre caché et ignoré par le layout.
+        self._input_widget.hide()
+        self._input_widget.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
+
+        layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(self._stack)
+        layout.setSpacing(0)
+        layout.addWidget(self._display_widget)
+        layout.addWidget(self._input_widget)
         self.setLayout(layout)
 
     def _build_display_widget(self) -> QWidget:
@@ -41,13 +49,23 @@ class NodeWidget(QWidget):
         raise NotImplementedError
 
     def enter_display_mode(self):
-        self._stack.setCurrentWidget(self._display_widget)
+        self._input_widget.hide()
+        self._input_widget.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
+        self._display_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        self._display_widget.show()
+        self._is_in_input_mode = False
+        self.updateGeometry()
 
     def enter_input_mode(self):
-        self._stack.setCurrentWidget(self._input_widget)
+        self._display_widget.hide()
+        self._display_widget.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
+        self._input_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        self._input_widget.show()
+        self._is_in_input_mode = True
+        self.updateGeometry()
 
     def is_in_input_mode(self) -> bool:
-        return self._stack.currentWidget() is self._input_widget
+        return self._is_in_input_mode
 
     def _request_input_mode(self):
         self.input_mode_requested.emit(self)
