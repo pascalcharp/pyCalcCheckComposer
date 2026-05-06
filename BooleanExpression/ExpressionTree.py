@@ -9,12 +9,16 @@ class BooleanExpressionTree:
     def __init__(self):
         self._root_node = ENode()
         self._nodes = {self._root_node.node_id: self._root_node}
+        self._parents = {}
 
     def get_root_id(self):
         return self._root_node.node_id
 
     def get_node(self, node_id):
         return self._nodes[node_id]
+
+    def get_parent_id(self, node_id):
+        return self._parents[node_id]
 
     def aux_collapse_node(self, node):
         if not node.has_children():
@@ -23,6 +27,7 @@ class BooleanExpressionTree:
         for child in node.get_children():
             self.aux_collapse_node(child)
             self._nodes.pop(child.node_id)
+            self._parents.pop(child.node_id, None)
 
         node.clear_children()
 
@@ -40,7 +45,8 @@ class BooleanExpressionTree:
 
         new_node = IdNode(name)
         node.add_children([new_node])
-        self._nodes |= {new_node.node_id: new_node}
+        self._nodes[new_node.node_id] = new_node
+        self._parents[new_node.node_id] = node_id
 
         return new_node.node_id
 
@@ -51,9 +57,11 @@ class BooleanExpressionTree:
             raise Exception('Node {} may not be expanded'.format(node_id))
 
         lhs = ENode()
+        op_node = OpNode(op)
         rhs = ENode()
-        node.add_children([lhs, OpNode(op), rhs])
-        self._nodes.update({lhs.node_id: lhs, rhs.node_id: rhs})
+        node.add_children([lhs, op_node, rhs])
+        self._nodes.update({lhs.node_id: lhs, op_node.node_id: op_node, rhs.node_id: rhs})
+        self._parents.update({lhs.node_id: node_id, op_node.node_id: node_id, rhs.node_id: node_id})
         return lhs.node_id, rhs.node_id
 
     def generate_unary_operator_production(self, node_id, op):
@@ -62,9 +70,11 @@ class BooleanExpressionTree:
         if node.has_children():
             raise Exception('Node {} may not be expanded'.format(node_id))
 
+        op_node = OpNode(op)
         arg = ENode()
-        node.add_children([OpNode(op), arg])
-        self._nodes.update({arg.node_id: arg})
+        node.add_children([op_node, arg])
+        self._nodes.update({op_node.node_id: op_node, arg.node_id: arg})
+        self._parents.update({op_node.node_id: node_id, arg.node_id: node_id})
         return arg.node_id
 
     def generate_parenthesis_production(self, node_id):
@@ -73,10 +83,22 @@ class BooleanExpressionTree:
         if node.has_children():
             raise Exception('Node {} may not be expanded'.format(node_id))
 
+        lp = OpNode("Leftparen")
         arg = ENode()
-        node.add_children([OpNode("Leftparen"), arg, OpNode("Rightparen")])
-        self._nodes.update({arg.node_id: arg})
+        rp = OpNode("Rightparen")
+        node.add_children([lp, arg, rp])
+        self._nodes.update({lp.node_id: lp, arg.node_id: arg, rp.node_id: rp})
+        self._parents.update({lp.node_id: node_id, arg.node_id: node_id, rp.node_id: node_id})
         return arg.node_id
+
+    def change_operator(self, op_node_id, new_op):
+        node = self._nodes[op_node_id]
+        assert isinstance(node, OpNode)
+        node.substitute_operator(new_op)
+
+    def revert_id_to_enode(self, id_node_id):
+        parent_id = self._parents[id_node_id]
+        self.collapse_node(parent_id)
 
     def modify_id_name(self, node_id, name):
         node = self._nodes[node_id]

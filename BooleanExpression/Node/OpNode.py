@@ -17,5 +17,9 @@ class OpNode(TerminalNode):
         self._op = op
         self._lexeme = BooleanOperators[self._op]
 
+    def substitute_operator(self, new_op):
+        self._op = new_op
+        self._lexeme = BooleanOperators[new_op]
+
     def get_copy(self):
         return OpNode(self._op)
