@@ -1,5 +1,22 @@
 # Journal de développement — pyCalcCheckComposer
 
+## Fine tuning visuel *(2026-05-06)*
+
+### Centrage des nœuds dans `ExpressionWidget`
+Les nœuds s'étiraient sur toute la largeur du widget. Ajout d'un `addStretch(1)` de chaque côté dans `render_expression()` — les nœuds se regroupent maintenant au centre.
+
+### Encadrement du mode Input dans `NodeWidget`
+En mode Input, le conteneur est désormais visuellement distingué des autres nœuds : bordure verte + fond vert pâle, appliqués via `setStyleSheet` avec le sélecteur `QWidget#nodeInput` (n'affecte pas les boutons et champs enfants).
+
+### Constantes ajoutées dans `GuiConstants`
+| Constante | Valeur |
+|---|---|
+| `NODE_INPUT_BORDER_COLOR` | `#4CAF50` |
+| `NODE_INPUT_BACKGROUND_COLOR` | `#e8f5e9` |
+| `NODE_INPUT_CONTAINER_STYLE` | template CSS pour le conteneur Input |
+
+---
+
 ## Centralisation des constantes GUI *(2026-05-05)*
 
 **Objectif :** Éliminer toutes les valeurs numériques codées en dur dans les widgets ; préparer la migration vers une configuration JSON.
