@@ -1,5 +1,34 @@
 # Journal de développement — pyCalcCheckComposer
 
+## Layout grille pour le mode Input *(2026-05-06)*
+
+**Objectif :** Réduire la largeur du widget en mode Input pour que l'utilisateur voie encore une partie de l'expression, tout en permettant une expansion verticale.
+
+### Fichiers modifiés
+
+#### `gui/ENodeWidget.py`
+- `_build_input_widget()` : `QHBoxLayout` → `QGridLayout` à 3 colonnes.
+- Les 9 boutons d'expansion occupent les lignes 0–2 (3 par ligne).
+- `_var_input` s'étire sur les colonnes 0–1 de la ligne 3 ; `_var_confirm` en colonne 2.
+- Suppression de `setFixedWidth(NODE_TEXT_INPUT_WIDTH)` sur `_var_input`.
+
+#### `gui/OpNodeWidget.py`
+- `_build_input_widget()` : `QHBoxLayout` → `QGridLayout` à 3 colonnes.
+- Ajout de `_BINARY_OPERATOR_ORDER` (liste ordonnée) pour un affichage déterministe des alternatives.
+- Le bouton `✕` suit immédiatement le dernier bouton d'alternative dans la grille.
+
+#### `gui/IdNodeWidget.py`
+- `_build_input_widget()` : `QHBoxLayout` → `QGridLayout` 2×2.
+- Disposition : `[_name_input | ✓]` / `[→E | ✕]`.
+- Suppression de `setFixedWidth(NODE_TEXT_INPUT_WIDTH)` sur `_name_input`.
+
+#### `gui/GuiConstants.py`
+- Suppression de `NODE_TEXT_INPUT_WIDTH` (devenu inutile).
+- Ajout de `NODE_INPUT_CONTAINER_PADDING = 4` et `NODE_INPUT_GRID_COLUMNS = 3`.
+- Suppression de `padding: 2px` dans le template CSS `NODE_INPUT_CONTAINER_STYLE`.
+
+---
+
 ## Fine tuning visuel *(2026-05-06)*
 
 ### Centrage des nœuds dans `ExpressionWidget`
