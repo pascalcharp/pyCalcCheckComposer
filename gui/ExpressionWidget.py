@@ -27,13 +27,15 @@ class ExpressionWidget(QWidget):
             if item.widget():
                 item.widget().deleteLater()
 
+        self.node_layout.addStretch(1)
         for node in self.tree.get_expression():
             widget = self._create_node_widget(node)
             widget.input_mode_requested.connect(self._on_input_mode_requested)
             widget.action_committed.connect(
                 lambda action, payload, w=widget: self._on_action_committed(w, action, payload)
             )
-            self.node_layout.addWidget(widget, alignment=Qt.AlignmentFlag.AlignCenter)
+            self.node_layout.addWidget(widget, alignment=Qt.AlignmentFlag.AlignVCenter)
+        self.node_layout.addStretch(1)
 
     def _create_node_widget(self, node):
         if isinstance(node, OpNode):

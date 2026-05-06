@@ -1,5 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QSizePolicy
 from PyQt6.QtCore import pyqtSignal
+from gui.GuiConstants import GuiConstants
 
 
 class NodeWidget(QWidget):
@@ -30,6 +31,15 @@ class NodeWidget(QWidget):
 
         self._display_widget = self._build_display_widget()
         self._input_widget = self._build_input_widget()
+
+        # Encadrement visuel du mode Input.
+        self._input_widget.setObjectName("nodeInput")
+        self._input_widget.setStyleSheet(
+            GuiConstants.NODE_INPUT_CONTAINER_STYLE.format(
+                border_color=GuiConstants.NODE_INPUT_BORDER_COLOR,
+                background_color=GuiConstants.NODE_INPUT_BACKGROUND_COLOR,
+            )
+        )
 
         # Le widget Input démarre caché et ignoré par le layout.
         self._input_widget.hide()

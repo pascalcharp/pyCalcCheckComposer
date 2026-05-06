@@ -23,6 +23,18 @@ class GuiConstants:
     """
     ADD_EXPRESSION_BUTTON_TEXT = "Ajouter une nouvelle expression"
 
+    # --- Mode Input (encadrement visuel) ---
+    NODE_INPUT_BORDER_COLOR = "#4CAF50"
+    NODE_INPUT_BACKGROUND_COLOR = "#e8f5e9"
+    NODE_INPUT_CONTAINER_STYLE = (
+        "QWidget#nodeInput {{"
+        " border: 2px solid {border_color};"
+        " border-radius: 6px;"
+        " background-color: {background_color};"
+        " padding: 2px;"
+        "}}"
+    )
+
     # --- Famille NodeWidget ---
     ENODE_DISPLAY_BUTTON_SIZE = 40      # bouton "?" carré (ENodeWidget)
     NODE_DISPLAY_BUTTON_HEIGHT = 40     # hauteur bouton Display (OpNodeWidget, IdNodeWidget)
