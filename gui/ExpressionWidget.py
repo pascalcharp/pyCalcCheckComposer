@@ -1,109 +1,67 @@
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QMessageBox
+from PyQt6.QtWidgets import QWidget, QHBoxLayout
 from PyQt6.QtCore import Qt
 
+from BooleanExpression.Node.IdNode import IdNode
 from BooleanExpression.Node.OpNode import OpNode
-from gui.ExpandNodeDialog import ExpandNodeDialog
-from gui.GuiConstants import GuiConstants
-from gui.NodeButton import NodeButton
+from gui.ENodeWidget import ENodeWidget
+from gui.IdNodeWidget import IdNodeWidget
+from gui.OpNodeWidget import OpNodeWidget
+
 
 class ExpressionWidget(QWidget):
     def __init__(self, expression_tree, proof_window, expression_index):
-        """
-        Initialise un widget pour une expression logique et une fenêtre associée.
-
-        :param expression_tree: Instance de BooleanExpressionTree.
-        :param proof_window: Référence à la ProofWindow pour communication.
-        :param expression_index: Index de l'expression dans la liste (ProofController).
-        """
         super().__init__()
-        self.tree = expression_tree  # L'arbre logique
-        self.proof_window = proof_window  # Référence à la ProofWindow
-        self.expression_index = expression_index  # Index dans ProofController
+        self.tree = expression_tree
+        self.proof_window = proof_window
+        self.expression_index = expression_index
+        self._active_node_widget = None
 
-        # Layout horizontal pour les noeuds de l'expression
         self.node_layout = QHBoxLayout()
-
-        # Afficher les noeuds de l'expression
         self.render_expression()
-
-        # Ajouter le layout horizontal au widget
         self.setLayout(self.node_layout)
 
     def render_expression(self):
-        """
-        Reconstruit l'affichage graphique de l'arbre logique dans ce widget,
-        chaque noeud est disposé horizontalement.
-        """
-        print("DEBUG: Rendu de l'expression :", self.tree)
-        # Nettoyer les nodes existants (avant affichage ou modification)
-        for i in reversed(range(self.node_layout.count())):
-            self.node_layout.itemAt(i).widget().deleteLater()
+        self._active_node_widget = None
+        while self.node_layout.count():
+            item = self.node_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
 
-        # Obtenir tous les noeuds de l'expression
-        expression_nodes = self.tree.get_expression()
+        for node in self.tree.get_expression():
+            widget = self._create_node_widget(node)
+            widget.input_mode_requested.connect(self._on_input_mode_requested)
+            widget.action_committed.connect(
+                lambda action, payload, w=widget: self._on_action_committed(w, action, payload)
+            )
+            self.node_layout.addWidget(widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        # Ajouter chaque noeud à la disposition horizontale
-        for node in expression_nodes:
-            if isinstance(node, OpNode):  # Si le node est un opérateur ou une parenthèse
-                button = QPushButton(node.__str__())
-                button.setFixedSize(GuiConstants.BUTTON_OPERATOR_WIDTH, GuiConstants.BUTTON_OPERATOR_HEIGHT)
-                button.setEnabled(False)  # Non cliquable
-
-                # Générer dynamiquement le style pour les NodeButtons
-                button.setStyleSheet(
-                    GuiConstants.STYLE_BUTTON_NODE_TEMPLATE.format(
-                        background_color=GuiConstants.COLOR_NODE_BUTTON_BACKGROUND,
-                        text_color=GuiConstants.COLOR_NODE_BUTTON_TEXT,
-                        border_color=GuiConstants.COLOR_NODE_BUTTON_BORDER,
-                        hover_color=GuiConstants.COLOR_NODE_BUTTON_HOVER
-                    )
-                )
-
-            else:  # Si c'est un Enode
-                    button = NodeButton(
-                        node_id=node.node_id,
-                        text=GuiConstants.NODE_BUTTON_TEXT,  # Texte affiché pour chaque Enode
-                        on_click=self.display_popup_to_expand  # Action effectuée si on clique dessus
-                    )
-
-            self.node_layout.addWidget(button, alignment=Qt.AlignmentFlag.AlignCenter)
-
-    def display_popup_to_expand(self, node_id):
-        """
-        Affiche une boîte de dialogue pour choisir un opérateur pour étendre un ENode.
-        """
-        sender_button = self.sender()
-        assert isinstance(sender_button, (QPushButton, NodeButton))
-        button_position = sender_button.mapToGlobal(
-            sender_button.rect().bottomLeft()
-        )
-        dialog = ExpandNodeDialog(self)
-        button_width = sender_button.width()
-        dialog_width = dialog.sizeHint().width()
-
-        centered_x = button_position.x() + (button_width - dialog_width) / 2
-        height_offset = dialog.frameGeometry().height() - dialog.geometry().height()
-        centered_y = button_position.y() - height_offset
-        dialog.move(round(centered_x), centered_y)
-
-        if dialog.exec():  # Si l'utilisateur sélectionne un opérateur
-            selected_operator = dialog.get_selected_operator()
-            print(f"DEBUG: Opérateur choisi : {selected_operator}")
-            if selected_operator:
-                # Appeler la méthode du contrôleur pour gérer l'expansion
-                self.proof_window.controller.expand_node(self.expression_index, node_id, selected_operator)
+    def _create_node_widget(self, node):
+        if isinstance(node, OpNode):
+            return OpNodeWidget(node.node_id, node.op_key)
+        elif isinstance(node, IdNode):
+            return IdNodeWidget(node.node_id, str(node))
         else:
-            print("Expansion de nœud annulée par l'utilisateur.")
+            return ENodeWidget(node.node_id)
 
-    def modify_expression(self):
-        """
-        Méthode préservée (optionnel) mais non utilisée directement dans la nouvelle structure.
-        """
-        try:
-            root_id = self.tree.get_root_id()
-            self.tree.generate_binary_operator_production(root_id, "AndOperator")
-            print("Expression modifiée :", self.tree)
-        except KeyError as e:
-            print(f"Erreur : Opérateur inexistant dans BooleanOperators ({e})")
-        except Exception as e:
-            print("Erreur lors de la modification de l'expression :", e)
+    def _on_input_mode_requested(self, requesting_widget):
+        if self._active_node_widget is not None and self._active_node_widget is not requesting_widget:
+            self._active_node_widget.enter_display_mode()
+        self._active_node_widget = requesting_widget
+        requesting_widget.enter_input_mode()
+
+    def _on_action_committed(self, node_widget, action, payload):
+        self._active_node_widget = None
+        c = self.proof_window.controller
+        idx = self.expression_index
+        nid = node_widget.node_id
+
+        if action == "expand":
+            c.expand_node(idx, nid, payload)
+        elif action == "to_id":
+            c.convert_to_id(idx, nid, payload)
+        elif action == "change_op":
+            c.change_operator(idx, nid, payload)
+        elif action == "rename":
+            c.rename_id(idx, nid, payload)
+        elif action == "revert":
+            c.revert_to_enode(idx, nid)

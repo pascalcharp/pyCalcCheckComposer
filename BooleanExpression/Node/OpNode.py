@@ -17,6 +17,10 @@ class OpNode(TerminalNode):
         self._op = op
         self._lexeme = BooleanOperators[self._op]
 
+    @property
+    def op_key(self):
+        return self._op
+
     def substitute_operator(self, new_op):
         self._op = new_op
         self._lexeme = BooleanOperators[new_op]

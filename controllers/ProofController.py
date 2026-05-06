@@ -1,56 +1,49 @@
-from PyQt6.QtWidgets import QMessageBox
 from BooleanExpression.ExpressionTree import BooleanExpressionTree
 from gui.ExpressionWidget import ExpressionWidget
 
 
 class ProofController:
     def __init__(self, proof_window):
-        """
-        Initialise le contrôleur pour gérer la logique et les interactions
-        entre la vue (ProofWindow) et les modèles (BooleanExpressionTree).
-        """
-        self.proof_window = proof_window  # Référence à la vue
-        self.proofs = []  # Liste des modèles (BooleanExpressionTree)
+        self.proof_window = proof_window
+        self.proofs = []
 
     def add_new_expression(self):
-        """
-        Crée un nouvel arbre logique (modèle) et un widget associé (vue), puis les connecte.
-        """
-        # Créer un nouveau modèle (arbre logique)
         new_expression_tree = BooleanExpressionTree()
-
-        # Ajouter à la liste des preuves
         self.proofs.append(new_expression_tree)
-
-        # Créer un widget pour affichage/modification
         expression_index = len(self.proofs) - 1
         new_expression_widget = ExpressionWidget(new_expression_tree, self.proof_window, expression_index)
-
-        # Ajouter le widget à la fenêtre
         self.proof_window.add_expression_widget(new_expression_widget)
 
     def expand_node(self, expression_index, node_id, operator):
-        """
-        Étend le nœud ENode avec l'opérateur donné.
-
-        :param expression_index: Index de l'expression dans la liste.
-        :param node_id: ID du nœud à étendre.
-        :param operator: Opérateur à utiliser pour l'expansion.
-        """
-        expression_tree = self.proofs[expression_index]
-
-        try:# Étendre le nœud avec l'opérateur sélectionné
+        tree = self.proofs[expression_index]
+        def do():
             if operator == "NotOperator":
-                expression_tree.generate_unary_operator_production(node_id, operator)
-            elif operator == "AndOperator" or operator == "OrOperator":
-                expression_tree.generate_binary_operator_production(node_id, operator)
-            elif operator == "Leftparen" or operator == "Rightparen":
-                expression_tree.generate_parenthesis_production(node_id)
+                tree.generate_unary_operator_production(node_id, operator)
+            elif operator == "Leftparen":
+                tree.generate_parenthesis_production(node_id)
             else:
-                raise ValueError(f"Opérateur invalide : {operator}")
+                tree.generate_binary_operator_production(node_id, operator)
+        self._refresh(expression_index, do)
 
-            # Rafraîchir l'affichage
+    def convert_to_id(self, expression_index, enode_id, name):
+        tree = self.proofs[expression_index]
+        self._refresh(expression_index, lambda: tree.generate_id_production(enode_id, name))
+
+    def change_operator(self, expression_index, op_node_id, new_op):
+        tree = self.proofs[expression_index]
+        self._refresh(expression_index, lambda: tree.change_operator(op_node_id, new_op))
+
+    def rename_id(self, expression_index, id_node_id, new_name):
+        tree = self.proofs[expression_index]
+        self._refresh(expression_index, lambda: tree.modify_id_name(id_node_id, new_name))
+
+    def revert_to_enode(self, expression_index, id_node_id):
+        tree = self.proofs[expression_index]
+        self._refresh(expression_index, lambda: tree.revert_id_to_enode(id_node_id))
+
+    def _refresh(self, expression_index, operation):
+        try:
+            operation()
             self.proof_window.update_expression_widget(expression_index)
-
         except Exception as e:
             self.proof_window.display_error_message(str(e))
