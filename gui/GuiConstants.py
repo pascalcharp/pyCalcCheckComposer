@@ -22,3 +22,11 @@ class GuiConstants:
         }}
     """
     ADD_EXPRESSION_BUTTON_TEXT = "Ajouter une nouvelle expression"
+
+    # --- Famille NodeWidget ---
+    ENODE_DISPLAY_BUTTON_SIZE = 40      # bouton "?" carré (ENodeWidget)
+    NODE_DISPLAY_BUTTON_HEIGHT = 40     # hauteur bouton Display (OpNodeWidget, IdNodeWidget)
+    NODE_INPUT_BUTTON_HEIGHT = 35       # hauteur de tous les boutons en mode Input
+    NODE_ACTION_BUTTON_WIDTH = 30       # largeur des petits boutons ✓ → ✕
+    NODE_TEXT_INPUT_WIDTH = 80          # largeur des champs texte variable / nom
+    NODE_INPUT_LAYOUT_SPACING = 4       # espacement du layout en mode Input

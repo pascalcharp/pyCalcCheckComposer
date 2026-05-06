@@ -1,5 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QPushButton
 from BooleanExpression.Node.OpNode import BooleanOperators
+from gui.GuiConstants import GuiConstants
 from gui.NodeWidget import NodeWidget
 
 _BINARY_OPERATORS = frozenset({
@@ -17,7 +18,7 @@ class OpNodeWidget(NodeWidget):
 
     def _build_display_widget(self) -> QWidget:
         btn = QPushButton(BooleanOperators[self._op_key].strip())
-        btn.setFixedHeight(40)
+        btn.setFixedHeight(GuiConstants.NODE_DISPLAY_BUTTON_HEIGHT)
         if self._op_key in _BINARY_OPERATORS:
             btn.clicked.connect(self._request_input_mode)
         else:
@@ -28,20 +29,21 @@ class OpNodeWidget(NodeWidget):
         container = QWidget()
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(4)
+        layout.setSpacing(GuiConstants.NODE_INPUT_LAYOUT_SPACING)
 
         self._alt_buttons = {}
         for alt_key in _BINARY_OPERATORS:
             if alt_key == self._op_key:
                 continue
             btn = QPushButton(BooleanOperators[alt_key].strip())
-            btn.setFixedHeight(35)
+            btn.setFixedHeight(GuiConstants.NODE_INPUT_BUTTON_HEIGHT)
             btn.clicked.connect(lambda _, k=alt_key: self._commit_action("change_op", k))
             self._alt_buttons[alt_key] = btn
             layout.addWidget(btn)
 
         self._cancel_button = QPushButton("✕")
-        self._cancel_button.setFixedSize(30, 35)
+        self._cancel_button.setFixedSize(GuiConstants.NODE_ACTION_BUTTON_WIDTH,
+                                         GuiConstants.NODE_INPUT_BUTTON_HEIGHT)
         self._cancel_button.clicked.connect(self.enter_display_mode)
         layout.addWidget(self._cancel_button)
 

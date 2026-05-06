@@ -1,4 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QLineEdit
+from gui.GuiConstants import GuiConstants
 from gui.NodeWidget import NodeWidget
 
 _ENODE_EXPANSIONS = [
@@ -21,7 +22,8 @@ class ENodeWidget(NodeWidget):
 
     def _build_display_widget(self) -> QWidget:
         btn = QPushButton("?")
-        btn.setFixedSize(40, 40)
+        s = GuiConstants.ENODE_DISPLAY_BUTTON_SIZE
+        btn.setFixedSize(s, s)
         btn.clicked.connect(self._request_input_mode)
         return btn
 
@@ -29,23 +31,24 @@ class ENodeWidget(NodeWidget):
         container = QWidget()
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(4)
+        layout.setSpacing(GuiConstants.NODE_INPUT_LAYOUT_SPACING)
 
         self._op_buttons = {}
         for op_key, label in _ENODE_EXPANSIONS:
             btn = QPushButton(label)
-            btn.setFixedHeight(35)
+            btn.setFixedHeight(GuiConstants.NODE_INPUT_BUTTON_HEIGHT)
             btn.clicked.connect(lambda _, k=op_key: self._commit_action("expand", k))
             self._op_buttons[op_key] = btn
             layout.addWidget(btn)
 
         self._var_input = QLineEdit()
         self._var_input.setPlaceholderText("variable")
-        self._var_input.setFixedWidth(80)
+        self._var_input.setFixedWidth(GuiConstants.NODE_TEXT_INPUT_WIDTH)
         self._var_input.returnPressed.connect(self._on_var_confirmed)
 
         self._var_confirm = QPushButton("→")
-        self._var_confirm.setFixedSize(30, 35)
+        self._var_confirm.setFixedSize(GuiConstants.NODE_ACTION_BUTTON_WIDTH,
+                                       GuiConstants.NODE_INPUT_BUTTON_HEIGHT)
         self._var_confirm.clicked.connect(self._on_var_confirmed)
 
         layout.addWidget(self._var_input)
