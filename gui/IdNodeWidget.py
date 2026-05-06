@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QLineEdit
+from PyQt6.QtWidgets import QWidget, QGridLayout, QPushButton, QLineEdit
 from gui.GuiConstants import GuiConstants
 from gui.NodeWidget import NodeWidget
 
@@ -17,12 +17,12 @@ class IdNodeWidget(NodeWidget):
 
     def _build_input_widget(self) -> QWidget:
         container = QWidget()
-        layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
+        p = GuiConstants.NODE_INPUT_CONTAINER_PADDING
+        layout = QGridLayout()
+        layout.setContentsMargins(p, p, p, p)
         layout.setSpacing(GuiConstants.NODE_INPUT_LAYOUT_SPACING)
 
         self._name_input = QLineEdit(self._name)
-        self._name_input.setFixedWidth(GuiConstants.NODE_TEXT_INPUT_WIDTH)
         self._name_input.returnPressed.connect(self._on_rename_confirmed)
 
         self._rename_confirm = QPushButton("✓")
@@ -39,10 +39,10 @@ class IdNodeWidget(NodeWidget):
                                          GuiConstants.NODE_INPUT_BUTTON_HEIGHT)
         self._cancel_button.clicked.connect(self.enter_display_mode)
 
-        layout.addWidget(self._name_input)
-        layout.addWidget(self._rename_confirm)
-        layout.addWidget(self._revert_button)
-        layout.addWidget(self._cancel_button)
+        layout.addWidget(self._name_input,    0, 0)
+        layout.addWidget(self._rename_confirm, 0, 1)
+        layout.addWidget(self._revert_button,  1, 0)
+        layout.addWidget(self._cancel_button,  1, 1)
         container.setLayout(layout)
         return container
 

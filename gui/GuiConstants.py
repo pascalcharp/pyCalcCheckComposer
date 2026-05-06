@@ -31,7 +31,6 @@ class GuiConstants:
         " border: 2px solid {border_color};"
         " border-radius: 6px;"
         " background-color: {background_color};"
-        " padding: 2px;"
         "}}"
     )
 
@@ -40,5 +39,6 @@ class GuiConstants:
     NODE_DISPLAY_BUTTON_HEIGHT = 40     # hauteur bouton Display (OpNodeWidget, IdNodeWidget)
     NODE_INPUT_BUTTON_HEIGHT = 35       # hauteur de tous les boutons en mode Input
     NODE_ACTION_BUTTON_WIDTH = 30       # largeur des petits boutons ✓ → ✕
-    NODE_TEXT_INPUT_WIDTH = 80          # largeur des champs texte variable / nom
-    NODE_INPUT_LAYOUT_SPACING = 4       # espacement du layout en mode Input
+    NODE_INPUT_LAYOUT_SPACING = 4       # espacement entre boutons dans le layout Input
+    NODE_INPUT_CONTAINER_PADDING = 4    # marge interne du conteneur Input
+    NODE_INPUT_GRID_COLUMNS = 3         # nombre de colonnes de la grille Input
