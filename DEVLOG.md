@@ -1,5 +1,33 @@
 # Journal de développement — pyCalcCheckComposer
 
+## Classe `ProofApp` — point d'entrée et câblage MVC *(2026-05-06)*
+
+**Objectif :** Éliminer le couplage circulaire entre `ProofWindow` et `ProofController` ; préparer l'ouverture de plusieurs fenêtres indépendantes.
+
+### Problème antérieur
+`ProofWindow.__init__` créait `ProofController(self)` et `ProofController` stockait `self.proof_window` — les deux objets ne pouvaient pas exister l'un sans l'autre.
+
+### Fichiers modifiés
+
+#### `controllers/ProofController.py`
+- `__init__()` ne prend plus d'argument ; `self.proof_window = None` initialement.
+
+#### `gui/ProofWindow.py`
+- `__init__(self, controller)` reçoit le contrôleur par injection au lieu de le créer.
+- Import de `ProofController` supprimé.
+- Bloc `__main__` supprimé (plus le point d'entrée).
+
+### Fichier créé
+
+#### `ProofApp.py`
+- `ProofApp.__init__()` crée la `QApplication` et initialise la liste `_windows`.
+- `open_proof_window()` — factory : crée un `ProofController`, un `ProofWindow`, injecte chacun dans l'autre (`controller.proof_window = window`), ajoute la paire à `_windows` (prévient le GC), affiche la fenêtre.
+- `run()` — ouvre la première fenêtre et lance la boucle Qt.
+- Bloc `__main__` : `ProofApp().run()`.
+- La liste `_windows` permettra d'ouvrir plusieurs fenêtres indépendantes dans une version future.
+
+---
+
 ## Fermeture du mode Input par clic extérieur *(2026-05-06)*
 
 **Objectif :** Permettre à l'utilisateur de quitter le mode Input en cliquant n'importe où hors du nœud actif.

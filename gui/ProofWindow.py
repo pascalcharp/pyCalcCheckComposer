@@ -1,21 +1,19 @@
 from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget, QVBoxLayout, QPushButton, QScrollArea, QLabel, QFrame, \
     QSpacerItem, QSizePolicy, QMessageBox
 from PyQt6.QtCore import Qt
-from controllers.ProofController import ProofController
 from gui.ExpressionWidget import ExpressionWidget
 from gui.GuiConstants import GuiConstants
 
 
 class ProofWindow(QMainWindow):
 
-    def __init__(self):
+    def __init__(self, controller):
         super().__init__()
+
+        self.controller = controller
 
         # Titre de la fenêtre
         self.setWindowTitle(GuiConstants.MAIN_WINDOW_TITLE)
-
-        # Initialiser le contrôleur
-        self.controller = ProofController(self)
 
         # Configuration de la taille de la fenêtre
         self._configure_window_size()
@@ -114,8 +112,3 @@ class ProofWindow(QMainWindow):
 
 
 
-if __name__ == "__main__":
-    app = QApplication([])
-    window = ProofWindow()
-    window.show()
-    app.exec()

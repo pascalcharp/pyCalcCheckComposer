@@ -3,8 +3,8 @@ from gui.ExpressionWidget import ExpressionWidget
 
 
 class ProofController:
-    def __init__(self, proof_window):
-        self.proof_window = proof_window
+    def __init__(self):
+        self.proof_window = None
         self.proofs = []
 
     def add_new_expression(self):
