@@ -1,5 +1,18 @@
 # Journal de développement — pyCalcCheckComposer
 
+## Fermeture du mode Input par clic extérieur *(2026-05-06)*
+
+**Objectif :** Permettre à l'utilisateur de quitter le mode Input en cliquant n'importe où hors du nœud actif.
+
+### Fichier modifié
+
+#### `gui/ExpressionWidget.py`
+- Installation d'un event filter au niveau de `QApplication` dans `__init__`.
+- `eventFilter()` intercepte `MouseButtonPress` : si le clic est hors du `_active_node_widget` (testé via `mapFromGlobal`), appelle `enter_display_mode()` et remet `_active_node_widget` à `None`.
+- L'événement n'est pas consommé (`return False`) — le clic s'exécute normalement après la fermeture.
+
+---
+
 ## Layout grille pour le mode Input *(2026-05-06)*
 
 **Objectif :** Réduire la largeur du widget en mode Input pour que l'utilisateur voie encore une partie de l'expression, tout en permettant une expansion verticale.

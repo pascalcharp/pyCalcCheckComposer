@@ -1,5 +1,5 @@
-from PyQt6.QtWidgets import QWidget, QHBoxLayout
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QApplication
+from PyQt6.QtCore import Qt, QEvent
 
 from BooleanExpression.Node.IdNode import IdNode
 from BooleanExpression.Node.OpNode import OpNode
@@ -19,6 +19,16 @@ class ExpressionWidget(QWidget):
         self.node_layout = QHBoxLayout()
         self.render_expression()
         self.setLayout(self.node_layout)
+        QApplication.instance().installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        if (event.type() == QEvent.Type.MouseButtonPress
+                and self._active_node_widget is not None):
+            nw = self._active_node_widget
+            if not nw.rect().contains(nw.mapFromGlobal(event.globalPosition().toPoint())):
+                nw.enter_display_mode()
+                self._active_node_widget = None
+        return False
 
     def render_expression(self):
         self._active_node_widget = None
