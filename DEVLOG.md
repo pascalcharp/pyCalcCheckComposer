@@ -1,5 +1,60 @@
 # Journal de développement — pyCalcCheckComposer
 
+## Étape 5 — Câblage de l'action au contrôleur *(2026-05-07)*
+
+**Objectif :** Connecter «Réduire en E» au modèle via le contrôleur, et vérifier que l'expression se collapse correctement.
+
+### Fichiers modifiés
+
+#### `controllers/ProofController.py`
+- `collapse_subtree(expression_index, enode_id)` : appelle `tree.collapse_node(enode_id)` puis `_refresh`.
+
+#### `gui/ExpressionWidget.py`
+- `_on_collapse_to_enode(ancestor_id)` : remplace le stub par `controller.collapse_subtree(expression_index, ancestor_id)`.
+
+**Test :** construire `p AND q`, ⌘+cliquer les trois nœuds, clic-droit → «Réduire en E» → l'expression redevient `?`.
+
+---
+
+## Étape 4 — Menu contextuel sur clic-droit *(2026-05-07)*
+
+**Objectif :** Afficher un `QMenu` sur clic-droit dans l'expression, avec l'item «Réduire en E» actif si la sélection forme un sous-arbre complet, grisé sinon.
+
+### Fichier modifié : `gui/ExpressionWidget.py`
+
+- Import de `QMenu`.
+- `eventFilter` restructuré : `RightButton` et `LeftButton` traités séparément.
+  - `RightButton` dans les bornes du widget : ferme le mode Input si actif, appelle `_show_context_menu`, consomme l'événement (`return True`). Couvre le clic-droit natif **et** le Ctrl+clic macOS (tous deux signalés comme `RightButton`).
+  - `LeftButton` sans ⌘ : vide la sélection + ferme le mode Input si hors nœud actif.
+- `_show_context_menu(global_pos)` : calcule `find_collapsible_ancestor`, crée le `QMenu`, active ou grise l'item selon le résultat, déclenche `_on_collapse_to_enode` si l'item est choisi.
+- `_on_collapse_to_enode(ancestor_id)` : stub vide — câblage au contrôleur à l'étape 5.
+
+**Test :** clic-droit sur expression avec sélection valide (⌘+clic sur tous les nœuds d'un sous-arbre) → menu avec «Réduire en E» actif ; clic-droit sans sélection ou sélection partielle → item grisé.
+
+---
+
+## Étape 3 — `find_collapsible_ancestor()` dans `ExpressionTree` *(2026-05-07)*
+
+**Objectif :** Déterminer si un ensemble de nœuds visibles forme exactement le sous-arbre d'un ENode ancêtre, et retourner l'id de cet ENode.
+
+**Algorithme :**
+1. Pour chaque `node_id` sélectionné, remonter la chaîne de parents jusqu'à la racine.
+2. Calculer l'intersection de toutes les chaînes = ancêtres communs.
+3. Le LCA est le premier élément d'une chaîne qui appartient à cette intersection (le plus profond).
+4. Vérifier que l'ensemble des feuilles du LCA == exactement `node_ids`. Sinon → `None`.
+
+### Fichiers modifiés
+
+#### `BooleanExpression/ExpressionTree.py`
+- `find_collapsible_ancestor(node_ids: set) -> node_id | None`
+
+#### `tests/BooleanExpressionTests/ModelExtensionsTests.py`
+- `FindCollapsibleAncestorTests` : 7 tests couvrant sélection vide, arbre plat, sélection partielle, sous-arbre imbriqué, toutes les feuilles, sélection transversale invalide, nœud unique.
+
+**Test :** lancer `ModelExtensionsTests.py` — tous les tests doivent passer.
+
+---
+
 ## Étape 2 — `ExpressionWidget` gère l'ensemble de nœuds sélectionnés *(2026-05-07)*
 
 **Objectif :** Maintenir un ensemble cohérent de nœuds sélectionnés ; vider la sélection sur clic normal ou clic extérieur.

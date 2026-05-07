@@ -126,5 +126,41 @@ class BooleanExpressionTree:
         self.aux_build_expression(self._root_node, expression)
         return expression
 
+    def find_collapsible_ancestor(self, node_ids: set):
+        """
+        Retourne l'id de l'ENode ancêtre minimal dont l'ensemble exact de feuilles == node_ids,
+        ou None si aucun tel ancêtre n'existe.
+        """
+        if not node_ids:
+            return None
+
+        def get_ancestors(nid):
+            ancestors = []
+            current = nid
+            while current in self._parents:
+                current = self._parents[current]
+                ancestors.append(current)
+            return ancestors  # du parent immédiat jusqu'à la racine
+
+        chains = [get_ancestors(nid) for nid in node_ids]
+
+        common = set(chains[0])
+        for chain in chains[1:]:
+            common &= set(chain)
+
+        if not common:
+            return None
+
+        # Le LCA est le premier ancêtre du premier nœud qui est commun à tous.
+        for candidate in chains[0]:
+            if candidate in common:
+                leaves = []
+                self.aux_build_expression(self._nodes[candidate], leaves)
+                if {n.node_id for n in leaves} == node_ids:
+                    return candidate
+                return None  # LCA trouvé mais ne couvre pas exactement la sélection
+
+        return None
+
     def __str__(self):
         return self.aux_build_output_string(self._root_node, "")

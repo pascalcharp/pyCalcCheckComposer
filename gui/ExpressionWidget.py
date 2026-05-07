@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QApplication
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QApplication, QMenu
 from PyQt6.QtCore import Qt, QEvent
 
 from BooleanExpression.Node.IdNode import IdNode
@@ -25,14 +25,25 @@ class ExpressionWidget(QWidget):
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.Type.MouseButtonPress:
-            is_cmd = bool(event.modifiers() & Qt.KeyboardModifier.ControlModifier)
-            if not is_cmd:
-                self._clear_selection()
-            if self._active_node_widget is not None:
-                nw = self._active_node_widget
-                if not nw.rect().contains(nw.mapFromGlobal(event.globalPosition().toPoint())):
-                    nw.enter_display_mode()
-                    self._active_node_widget = None
+            pos = event.globalPosition().toPoint()
+
+            if event.button() == Qt.MouseButton.RightButton:
+                if self.rect().contains(self.mapFromGlobal(pos)):
+                    if self._active_node_widget is not None:
+                        self._active_node_widget.enter_display_mode()
+                        self._active_node_widget = None
+                    self._show_context_menu(pos)
+                    return True
+
+            elif event.button() == Qt.MouseButton.LeftButton:
+                if not (event.modifiers() & Qt.KeyboardModifier.ControlModifier):
+                    self._clear_selection()
+                if self._active_node_widget is not None:
+                    nw = self._active_node_widget
+                    if not nw.rect().contains(nw.mapFromGlobal(pos)):
+                        nw.enter_display_mode()
+                        self._active_node_widget = None
+
         return False
 
     def render_expression(self):
@@ -83,6 +94,17 @@ class ExpressionWidget(QWidget):
             self._active_node_widget.enter_display_mode()
         self._active_node_widget = requesting_widget
         requesting_widget.enter_input_mode()
+
+    def _show_context_menu(self, global_pos):
+        ancestor_id = self.tree.find_collapsible_ancestor(self._selected_node_ids)
+        menu = QMenu(self)
+        collapse_action = menu.addAction("Réduire en E")
+        collapse_action.setEnabled(ancestor_id is not None)
+        if menu.exec(global_pos) == collapse_action and ancestor_id is not None:
+            self._on_collapse_to_enode(ancestor_id)
+
+    def _on_collapse_to_enode(self, ancestor_id):
+        self.proof_window.controller.collapse_subtree(self.expression_index, ancestor_id)
 
     def _on_action_committed(self, node_widget, action, payload):
         self._active_node_widget = None

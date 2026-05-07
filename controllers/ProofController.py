@@ -41,6 +41,10 @@ class ProofController:
         tree = self.proofs[expression_index]
         self._refresh(expression_index, lambda: tree.revert_id_to_enode(id_node_id))
 
+    def collapse_subtree(self, expression_index, enode_id):
+        tree = self.proofs[expression_index]
+        self._refresh(expression_index, lambda: tree.collapse_node(enode_id))
+
     def _refresh(self, expression_index, operation):
         try:
             operation()
