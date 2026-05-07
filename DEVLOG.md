@@ -1,5 +1,44 @@
 # Journal de développement — pyCalcCheckComposer
 
+## Correctif : rendu incohérent sur macOS dark mode *(2026-05-07)*
+
+**Symptôme :** En mode Input, le fond vert clair est visible, mais les boutons n'ont pas de fond (labels blancs flottants) et le champ texte est noir. En mode Display, le bouton `?` reste invisible.
+
+**Cause :** Le style natif macOS (Cocoa) respecte le thème sombre du système (dark mode). Quand PyQt6 utilise ce style, les widgets enfants héritent des couleurs du thème sombre (texte blanc, fond de champ sombre), en conflit avec les stylesheets explicites (fond vert clair). La combinaison rend les boutons transparents et les labels illisibles.
+
+**Approche retenue :** plutôt que corriger les cas au cas par cas, définir explicitement tous les paramètres visuels dans `GuiConstants` et les appliquer globalement — l'app ne dépend ainsi d'aucun thème de plateforme.
+
+### Fichiers modifiés
+
+#### `gui/GuiConstants.py`
+- Ajout de la palette générale : `COLOR_TEXT`, `COLOR_BUTTON_BG`, `COLOR_BUTTON_BG_HOVER`, `COLOR_BUTTON_BG_PRESSED`, `COLOR_BUTTON_DISABLED_FG`, `COLOR_WIDGET_BORDER`, `COLOR_INPUT_BG`.
+- Ajout de `APP_STYLESHEET` : stylesheet globale couvrant `QPushButton` (normal, hover, pressed, disabled), `QLineEdit`, et `QWidget#nodeInput`.
+- Suppression de `NODE_INPUT_CONTAINER_STYLE` (absorbé par `APP_STYLESHEET`).
+
+#### `gui/NodeWidget.py`
+- Suppression du `setStyleSheet(...)` par widget sur `_input_widget` — l'`objectName("nodeInput")` suffit pour que `APP_STYLESHEET` s'applique.
+
+#### `ProofApp.py`
+- Ajout de `self._qt_app.setStyle("Fusion")` (base cross-platform) et `self._qt_app.setStyleSheet(GuiConstants.APP_STYLESHEET)`.
+
+---
+
+## Correctif : `_display_widget` invisible au démarrage *(2026-05-07)*
+
+**Symptôme :** Sur cette machine (Darwin 25.3.0), les nœuds n'apparaissent pas en mode Display à la création — ils deviennent visibles seulement après un premier passage en mode Input. Sur le MacBook, le comportement est normal.
+
+**Cause :** Dans `NodeWidget.__init__`, le `_display_widget` était créé visible par défaut (comportement Qt standard), mais jamais appelé avec `.show()` explicitement. Sur certaines versions de Qt / macOS, un widget fils créé avant que le parent soit attaché à la hiérarchie de fenêtres ne s'affiche pas automatiquement. La méthode `enter_display_mode()` corrigeait le problème car elle appelle `_display_widget.show()` — ce que `__init__` n'avait jamais fait.
+
+**Correctif — `gui/NodeWidget.py`**
+- Ajout à la fin de `__init__`, après `setLayout` :
+  ```python
+  self._display_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+  self._display_widget.show()
+  ```
+- Cela garantit l'état Display initial sur toutes les plateformes, sans modifier la logique existante.
+
+---
+
 ## Classe `ProofApp` — point d'entrée et câblage MVC *(2026-05-06)*
 
 **Objectif :** Éliminer le couplage circulaire entre `ProofWindow` et `ProofController` ; préparer l'ouverture de plusieurs fenêtres indépendantes.

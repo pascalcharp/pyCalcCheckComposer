@@ -32,14 +32,8 @@ class NodeWidget(QWidget):
         self._display_widget = self._build_display_widget()
         self._input_widget = self._build_input_widget()
 
-        # Encadrement visuel du mode Input.
+        # Encadrement visuel du mode Input : le style vient de APP_STYLESHEET via l'objectName.
         self._input_widget.setObjectName("nodeInput")
-        self._input_widget.setStyleSheet(
-            GuiConstants.NODE_INPUT_CONTAINER_STYLE.format(
-                border_color=GuiConstants.NODE_INPUT_BORDER_COLOR,
-                background_color=GuiConstants.NODE_INPUT_BACKGROUND_COLOR,
-            )
-        )
 
         # Le widget Input démarre caché et ignoré par le layout.
         self._input_widget.hide()
@@ -51,6 +45,10 @@ class NodeWidget(QWidget):
         layout.addWidget(self._display_widget)
         layout.addWidget(self._input_widget)
         self.setLayout(layout)
+
+        # Garantit l'état initial Display sur toutes les plateformes.
+        self._display_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        self._display_widget.show()
 
     def _build_display_widget(self) -> QWidget:
         raise NotImplementedError
