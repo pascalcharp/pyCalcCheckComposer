@@ -1,5 +1,27 @@
 # Journal de développement — pyCalcCheckComposer
 
+## Étape 1 — État de sélection visuel dans `NodeWidget` *(2026-05-07)*
+
+**Objectif :** Permettre la sélection individuelle d'un nœud par Ctrl+clic, avec retour visuel (fond jaune), sans perturber le comportement existant (clic normal → mode Input).
+
+### Fichiers modifiés
+
+#### `gui/GuiConstants.py`
+- `COLOR_SELECTED_BG = "#ffe082"` — fond jaune ambré pour un nœud sélectionné.
+- `COLOR_SELECTED_BORDER = "#ffc107"` — bordure dorée.
+
+#### `gui/NodeWidget.py`
+- Signal `selection_toggled(object)` ajouté.
+- Attribut `_is_selected: bool` initialisé à `False`.
+- `installEventFilter(self)` posé sur `_display_widget` dans `__init__`.
+- `eventFilter` : intercepte `MouseButtonPress` avec modificateur `Ctrl` sur le bouton Display ; bascule `_is_selected`, émet `selection_toggled`, retourne `True` (consomme l'événement — le mode Input n'est pas déclenché).
+- `set_selected(bool)` : applique ou efface un `setStyleSheet` sur `_display_widget` (jaune ambré si sélectionné, `""` sinon pour retomber sur `APP_STYLESHEET`).
+- `is_selected() -> bool`.
+
+**Test :** Ctrl+clic un nœud → fond jaune ; Ctrl+clic à nouveau → retour normal ; clic normal → mode Input, pas de sélection.
+
+---
+
 ## Correctif : rendu incohérent sur macOS dark mode *(2026-05-07)*
 
 **Symptôme :** En mode Input, le fond vert clair est visible, mais les boutons n'ont pas de fond (labels blancs flottants) et le champ texte est noir. En mode Display, le bouton `?` reste invisible.

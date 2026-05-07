@@ -31,6 +31,8 @@ class GuiConstants:
     COLOR_BUTTON_DISABLED_FG = "#9e9e9e"
     COLOR_WIDGET_BORDER      = "#bdbdbd"
     COLOR_INPUT_BG           = "#ffffff"
+    COLOR_SELECTED_BG        = "#ffe082"   # jaune ambré — nœud sélectionné
+    COLOR_SELECTED_BORDER    = "#ffc107"   # bordure dorée — nœud sélectionné
 
     # --- Mode Input (encadrement visuel) ---
     NODE_INPUT_BORDER_COLOR      = "#4CAF50"
