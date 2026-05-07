@@ -81,13 +81,14 @@ class NodeWidget(QWidget):
         return self._is_in_input_mode
 
     def eventFilter(self, obj, event):
+        # Sur macOS, ⌘ Command = ControlModifier (⌃ Ctrl = MetaModifier + clic droit).
         if (obj is self._display_widget
                 and event.type() == QEvent.Type.MouseButtonPress
                 and event.button() == Qt.MouseButton.LeftButton
                 and event.modifiers() & Qt.KeyboardModifier.ControlModifier):
             self.set_selected(not self._is_selected)
             self.selection_toggled.emit(self)
-            return True   # consomme l'événement : le bouton n'ouvre pas le mode Input
+            return True
         return False
 
     def set_selected(self, selected: bool):

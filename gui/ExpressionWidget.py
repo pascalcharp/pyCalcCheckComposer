@@ -15,6 +15,8 @@ class ExpressionWidget(QWidget):
         self.proof_window = proof_window
         self.expression_index = expression_index
         self._active_node_widget = None
+        self._selected_node_ids = set()
+        self._node_widgets = {}        # node_id → NodeWidget
 
         self.node_layout = QHBoxLayout()
         self.render_expression()
@@ -22,16 +24,21 @@ class ExpressionWidget(QWidget):
         QApplication.instance().installEventFilter(self)
 
     def eventFilter(self, obj, event):
-        if (event.type() == QEvent.Type.MouseButtonPress
-                and self._active_node_widget is not None):
-            nw = self._active_node_widget
-            if not nw.rect().contains(nw.mapFromGlobal(event.globalPosition().toPoint())):
-                nw.enter_display_mode()
-                self._active_node_widget = None
+        if event.type() == QEvent.Type.MouseButtonPress:
+            is_cmd = bool(event.modifiers() & Qt.KeyboardModifier.ControlModifier)
+            if not is_cmd:
+                self._clear_selection()
+            if self._active_node_widget is not None:
+                nw = self._active_node_widget
+                if not nw.rect().contains(nw.mapFromGlobal(event.globalPosition().toPoint())):
+                    nw.enter_display_mode()
+                    self._active_node_widget = None
         return False
 
     def render_expression(self):
         self._active_node_widget = None
+        self._selected_node_ids = set()
+        self._node_widgets = {}
         while self.node_layout.count():
             item = self.node_layout.takeAt(0)
             if item.widget():
@@ -40,10 +47,12 @@ class ExpressionWidget(QWidget):
         self.node_layout.addStretch(1)
         for node in self.tree.get_expression():
             widget = self._create_node_widget(node)
+            self._node_widgets[node.node_id] = widget
             widget.input_mode_requested.connect(self._on_input_mode_requested)
             widget.action_committed.connect(
                 lambda action, payload, w=widget: self._on_action_committed(w, action, payload)
             )
+            widget.selection_toggled.connect(self._on_selection_toggled)
             self.node_layout.addWidget(widget, alignment=Qt.AlignmentFlag.AlignVCenter)
         self.node_layout.addStretch(1)
 
@@ -55,7 +64,21 @@ class ExpressionWidget(QWidget):
         else:
             return ENodeWidget(node.node_id)
 
+    def _on_selection_toggled(self, widget):
+        if widget.is_selected():
+            self._selected_node_ids.add(widget.node_id)
+        else:
+            self._selected_node_ids.discard(widget.node_id)
+
+    def _clear_selection(self):
+        for node_id in list(self._selected_node_ids):
+            widget = self._node_widgets.get(node_id)
+            if widget:
+                widget.set_selected(False)
+        self._selected_node_ids.clear()
+
     def _on_input_mode_requested(self, requesting_widget):
+        self._clear_selection()
         if self._active_node_widget is not None and self._active_node_widget is not requesting_widget:
             self._active_node_widget.enter_display_mode()
         self._active_node_widget = requesting_widget

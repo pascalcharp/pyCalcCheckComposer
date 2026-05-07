@@ -1,5 +1,22 @@
 # Journal de développement — pyCalcCheckComposer
 
+## Étape 2 — `ExpressionWidget` gère l'ensemble de nœuds sélectionnés *(2026-05-07)*
+
+**Objectif :** Maintenir un ensemble cohérent de nœuds sélectionnés ; vider la sélection sur clic normal ou clic extérieur.
+
+### Fichier modifié : `gui/ExpressionWidget.py`
+
+- `_selected_node_ids: set` et `_node_widgets: dict` (node_id → NodeWidget) ajoutés dans `__init__` et réinitialisés dans `render_expression`.
+- `render_expression` : connecte `selection_toggled` de chaque widget à `_on_selection_toggled` et peuple `_node_widgets`.
+- `_on_selection_toggled(widget)` : ajoute ou retire le `node_id` de `_selected_node_ids` selon `widget.is_selected()`.
+- `_clear_selection()` : appelle `set_selected(False)` sur chaque widget sélectionné, puis vide le set.
+- `eventFilter` : sur tout `MouseButtonPress` sans modificateur ⌘, appelle `_clear_selection()`. Les ⌘+clics sont laissés passer sans vider la sélection.
+- `_on_input_mode_requested` : appelle `_clear_selection()` avant d'entrer en mode Input.
+
+**Test :** ⌘+clic plusieurs nœuds → tous jaunes ; clic normal n'importe où → tous dé-sélectionnés.
+
+---
+
 ## Étape 1 — État de sélection visuel dans `NodeWidget` *(2026-05-07)*
 
 **Objectif :** Permettre la sélection individuelle d'un nœud par Ctrl+clic, avec retour visuel (fond jaune), sans perturber le comportement existant (clic normal → mode Input).
