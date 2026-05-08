@@ -1,5 +1,29 @@
 # Journal de développement — pyCalcCheckComposer
 
+## Suggestions de variables en mode Input *(2026-05-06)*
+
+**Objectif :** Proposer les variables déjà utilisées dans la preuve (ou un ensemble par défaut) dès l'entrée en mode Input d'un `ENodeWidget`.
+
+### Approche retenue
+Des boutons de suggestion sont ajoutés dynamiquement à la grille du widget Input plutôt qu'un `QCompleter` popup. Le popup Qt capture la souris et bloque les signaux `clicked` et `returnPressed` des autres widgets, rendant la confirmation impossible. Les boutons dans la grille n'ont aucun de ces effets secondaires.
+
+### Fichiers modifiés
+
+#### `controllers/ProofController.py`
+- Ajout de `get_used_variables() -> list[str]` : parcourt tous les arbres, collecte les noms des `IdNode` sans doublon ; retourne `["p", "q", "r", "s", "t"]` si aucune variable n'est encore définie.
+
+#### `gui/ExpressionWidget.py`
+- `_on_input_mode_requested()` : si le widget demandeur est un `ENodeWidget`, appelle `set_variable_suggestions()` avec la liste fournie par le contrôleur avant d'entrer en mode Input.
+- `eventFilter()` : garde `activePopupWidget()` commentée — empêche notre logique de fermeture de s'exécuter pendant qu'un popup Qt (menu contextuel, etc.) a la main.
+
+#### `gui/ENodeWidget.py`
+- `set_variable_suggestions(names)` : vide les anciens boutons de suggestion puis en crée un par nom, ajoutés à la grille sous la ligne du champ texte. Cliquer un bouton appelle directement `_commit_action("to_id", name)`.
+- `_clear_suggestion_buttons()` : retire et détruit les boutons de suggestion du layout.
+- `enter_display_mode()` : appelle `_clear_suggestion_buttons()` avant de déléguer au parent.
+- `_suggestion_buttons` initialisé avant `super().__init__()` (même patron que `_op_key` dans `OpNodeWidget`).
+
+---
+
 ## Étape 5 — Câblage de l'action au contrôleur *(2026-05-07)*
 
 **Objectif :** Connecter «Réduire en E» au modèle via le contrôleur, et vérifier que l'expression se collapse correctement.

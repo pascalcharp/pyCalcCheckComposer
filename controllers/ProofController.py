@@ -1,5 +1,8 @@
 from BooleanExpression.ExpressionTree import BooleanExpressionTree
+from BooleanExpression.Node.IdNode import IdNode
 from gui.ExpressionWidget import ExpressionWidget
+
+_DEFAULT_VARIABLES = ["p", "q", "r", "s", "t"]
 
 
 class ProofController:
@@ -44,6 +47,16 @@ class ProofController:
     def collapse_subtree(self, expression_index, enode_id):
         tree = self.proofs[expression_index]
         self._refresh(expression_index, lambda: tree.collapse_node(enode_id))
+
+    def get_used_variables(self) -> list[str]:
+        seen = set()
+        names = []
+        for tree in self.proofs:
+            for node in tree.get_expression():
+                if isinstance(node, IdNode) and str(node) not in seen:
+                    seen.add(str(node))
+                    names.append(str(node))
+        return names if names else list(_DEFAULT_VARIABLES)
 
     def _refresh(self, expression_index, operation):
         try:

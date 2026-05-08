@@ -25,6 +25,12 @@ class ExpressionWidget(QWidget):
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.Type.MouseButtonPress:
+            # Un popup Qt (ex. QCompleter, menu contextuel système) capture la souris ;
+            # laisser notre logique s'exécuter fermerait le widget actif avant que le
+            # popup ait livré sa sélection, causant un crash ou une perte de saisie.
+            if QApplication.activePopupWidget() is not None:
+                return False
+
             pos = event.globalPosition().toPoint()
 
             if event.button() == Qt.MouseButton.RightButton:
@@ -93,6 +99,10 @@ class ExpressionWidget(QWidget):
         if self._active_node_widget is not None and self._active_node_widget is not requesting_widget:
             self._active_node_widget.enter_display_mode()
         self._active_node_widget = requesting_widget
+        if isinstance(requesting_widget, ENodeWidget):
+            requesting_widget.set_variable_suggestions(
+                self.proof_window.controller.get_used_variables()
+            )
         requesting_widget.enter_input_mode()
 
     def _show_context_menu(self, global_pos):

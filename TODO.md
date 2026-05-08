@@ -4,7 +4,7 @@
 
 | Priorité | Item                       | Raison                                                              |
 |----------|----------------------------|---------------------------------------------------------------------|
-| **P1**   | Suggestions de variables   | Gain immédiat, périmètre réduit, aucune dépendance                  |
+| ~~P1~~   | ~~Suggestions de variables~~ | ~~Réalisé 2026-05-06~~                                            |
 | **P1**   | Extension / annexion       | Friction quotidienne élevée, périmètre contenu                      |
 | **P2**   | Hints entre expressions    | Structure sémantique centrale ; doit précéder la sérialisation      |
 | **P2**   | Menu + gestion de preuve   | Nécessite que les hints soient définis pour la sérialisation complète |
