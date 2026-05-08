@@ -123,6 +123,11 @@ class ExpressionWidget(QWidget):
                 lambda: self._on_collapse_to_enode(ancestor_id)
             )
 
+        paren_action = menu.addAction("Mettre entre parenthèses")
+        paren_action.setEnabled(enabled)
+        if enabled:
+            paren_action.triggered.connect(lambda: self._on_parenthesize(ancestor_id))
+
         annex_menu = menu.addMenu("Annexer →")
         annex_menu.setEnabled(enabled)
         if enabled:
@@ -136,6 +141,9 @@ class ExpressionWidget(QWidget):
 
     def _on_collapse_to_enode(self, ancestor_id):
         self.proof_window.controller.collapse_subtree(self.expression_index, ancestor_id)
+
+    def _on_parenthesize(self, ancestor_id):
+        self.proof_window.controller.parenthesize(self.expression_index, ancestor_id)
 
     def _on_annex_operator(self, ancestor_id, op):
         self.proof_window.controller.annex_operator(self.expression_index, ancestor_id, op)

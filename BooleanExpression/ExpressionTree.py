@@ -114,6 +114,29 @@ class BooleanExpressionTree:
         for child in current_children:
             self._parents[child.node_id] = left.node_id
 
+    def parenthesize(self, ancestor_id):
+        ancestor = self._nodes[ancestor_id]
+        assert isinstance(ancestor, ENode) and ancestor.has_children()
+
+        lp = OpNode("Leftparen")
+        inner = ENode()
+        rp = OpNode("Rightparen")
+
+        current_children = list(ancestor.get_children())
+        inner.add_children(current_children)
+        ancestor.clear_children()
+        ancestor.add_children([lp, inner, rp])
+
+        self._nodes[lp.node_id] = lp
+        self._nodes[inner.node_id] = inner
+        self._nodes[rp.node_id] = rp
+
+        self._parents[lp.node_id] = ancestor_id
+        self._parents[inner.node_id] = ancestor_id
+        self._parents[rp.node_id] = ancestor_id
+        for child in current_children:
+            self._parents[child.node_id] = inner.node_id
+
     def change_operator(self, op_node_id, new_op):
         node = self._nodes[op_node_id]
         assert isinstance(node, OpNode)

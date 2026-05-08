@@ -1,5 +1,26 @@
 # Journal de développement — pyCalcCheckComposer
 
+## Parenthésage d'un sous-arbre *(2026-05-06)*
+
+**Objectif :** Permettre d'entourer un sous-arbre sélectionné de parenthèses sans le collapser.
+
+### Mécanique
+Identique à l'annexion : les enfants de l'ENode ancêtre sont transférés dans un nouveau `ENode_inner` ; l'ancêtre reçoit `[OpNode("Leftparen"), ENode_inner, OpNode("Rightparen")]`.
+
+### Fichiers modifiés
+
+#### `BooleanExpression/ExpressionTree.py`
+- `parenthesize(ancestor_id)` : transfère les enfants de l'ancêtre dans `ENode_inner`, enveloppe avec `Leftparen` / `Rightparen`, met à jour `_nodes` et `_parents`.
+
+#### `controllers/ProofController.py`
+- `parenthesize(expression_index, ancestor_id)` : délègue + refresh.
+
+#### `gui/ExpressionWidget.py`
+- `_show_context_menu()` : ajoute l'action "Mettre entre parenthèses" entre "Réduire en E" et "Annexer →".
+- `_on_parenthesize(ancestor_id)` : dispatch vers le contrôleur.
+
+---
+
 ## Annexion d'opérateur sur un sous-arbre *(2026-05-06)*
 
 **Objectif :** Permettre d'annexer un opérateur binaire à un sous-arbre existant sans le collapser — l'expression sélectionnée devient l'opérande gauche du nouvel opérateur.
