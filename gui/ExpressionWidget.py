@@ -2,7 +2,13 @@ from PyQt6.QtWidgets import QWidget, QHBoxLayout, QApplication, QMenu
 from PyQt6.QtCore import Qt, QEvent
 
 from BooleanExpression.Node.IdNode import IdNode
-from BooleanExpression.Node.OpNode import OpNode
+from BooleanExpression.Node.OpNode import OpNode, BooleanOperators
+
+_ANNEX_OPERATOR_ORDER = [
+    "AndOperator", "OrOperator", "XorOperator",
+    "ImplicationOperator", "ConsequenceOperator",
+    "EquivalentOperator", "NotEquivalentOperator",
+]
 from gui.ENodeWidget import ENodeWidget
 from gui.IdNodeWidget import IdNodeWidget
 from gui.OpNodeWidget import OpNodeWidget
@@ -107,14 +113,32 @@ class ExpressionWidget(QWidget):
 
     def _show_context_menu(self, global_pos):
         ancestor_id = self.tree.find_collapsible_ancestor(self._selected_node_ids)
+        enabled = ancestor_id is not None
         menu = QMenu(self)
+
         collapse_action = menu.addAction("Réduire en E")
-        collapse_action.setEnabled(ancestor_id is not None)
-        if menu.exec(global_pos) == collapse_action and ancestor_id is not None:
-            self._on_collapse_to_enode(ancestor_id)
+        collapse_action.setEnabled(enabled)
+        if enabled:
+            collapse_action.triggered.connect(
+                lambda: self._on_collapse_to_enode(ancestor_id)
+            )
+
+        annex_menu = menu.addMenu("Annexer →")
+        annex_menu.setEnabled(enabled)
+        if enabled:
+            for op_key in _ANNEX_OPERATOR_ORDER:
+                action = annex_menu.addAction(BooleanOperators[op_key].strip())
+                action.triggered.connect(
+                    lambda _, k=op_key, a=ancestor_id: self._on_annex_operator(a, k)
+                )
+
+        menu.exec(global_pos)
 
     def _on_collapse_to_enode(self, ancestor_id):
         self.proof_window.controller.collapse_subtree(self.expression_index, ancestor_id)
+
+    def _on_annex_operator(self, ancestor_id, op):
+        self.proof_window.controller.annex_operator(self.expression_index, ancestor_id, op)
 
     def _on_action_committed(self, node_widget, action, payload):
         self._active_node_widget = None

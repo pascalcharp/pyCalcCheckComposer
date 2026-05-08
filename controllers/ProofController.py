@@ -48,6 +48,10 @@ class ProofController:
         tree = self.proofs[expression_index]
         self._refresh(expression_index, lambda: tree.collapse_node(enode_id))
 
+    def annex_operator(self, expression_index, ancestor_id, op):
+        tree = self.proofs[expression_index]
+        self._refresh(expression_index, lambda: tree.annex_operator(ancestor_id, op))
+
     def get_used_variables(self) -> list[str]:
         seen = set()
         names = []

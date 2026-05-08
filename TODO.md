@@ -5,7 +5,7 @@
 | Priorité | Item                       | Raison                                                              |
 |----------|----------------------------|---------------------------------------------------------------------|
 | ~~P1~~   | ~~Suggestions de variables~~ | ~~Réalisé 2026-05-06~~                                            |
-| **P1**   | Extension / annexion       | Friction quotidienne élevée, périmètre contenu                      |
+| ~~P1~~   | ~~Extension / annexion~~   | ~~Réalisé 2026-05-06~~                                              |
 | **P2**   | Hints entre expressions    | Structure sémantique centrale ; doit précéder la sérialisation      |
 | **P2**   | Menu + gestion de preuve   | Nécessite que les hints soient définis pour la sérialisation complète |
 | **P3**   | Undo / Redo                | Mieux fait quand toutes les opérations sont stables                 |

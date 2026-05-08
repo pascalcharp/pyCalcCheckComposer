@@ -1,5 +1,27 @@
 # Journal de développement — pyCalcCheckComposer
 
+## Annexion d'opérateur sur un sous-arbre *(2026-05-06)*
+
+**Objectif :** Permettre d'annexer un opérateur binaire à un sous-arbre existant sans le collapser — l'expression sélectionnée devient l'opérande gauche du nouvel opérateur.
+
+### Mécanique
+L'ENode ancêtre minimal de la sélection (trouvé via `find_collapsible_ancestor`) voit ses enfants transférés dans un nouveau `ENode_left`. L'ancêtre reçoit ensuite `[ENode_left, OpNode(op), ENode_right_vide]` comme nouveaux enfants. L'expression existante est préservée intacte comme opérande gauche.
+
+### Fichiers modifiés
+
+#### `BooleanExpression/ExpressionTree.py`
+- `annex_operator(ancestor_id, op)` : copie la liste des enfants de l'ancêtre, les transfère à un nouveau `ENode_left`, vide l'ancêtre et lui ajoute `[left, OpNode, right]`. Met à jour `_nodes` et `_parents` pour les nouveaux nœuds et recorrige les parents des enfants transférés.
+
+#### `controllers/ProofController.py`
+- `annex_operator(expression_index, ancestor_id, op)` : délègue à l'arbre + refresh.
+
+#### `gui/ExpressionWidget.py`
+- `_ANNEX_OPERATOR_ORDER` : liste ordonnée des 7 opérateurs binaires.
+- `_show_context_menu()` : ajoute un sous-menu "Annexer →" avec un item par opérateur ; activé uniquement si `find_collapsible_ancestor` retourne un résultat. Actions connectées via `triggered`.
+- `_on_annex_operator(ancestor_id, op)` : dispatch vers le contrôleur.
+
+---
+
 ## Suggestions de variables en mode Input *(2026-05-06)*
 
 **Objectif :** Proposer les variables déjà utilisées dans la preuve (ou un ensemble par défaut) dès l'entrée en mode Input d'un `ENodeWidget`.

@@ -91,6 +91,29 @@ class BooleanExpressionTree:
         self._parents.update({lp.node_id: node_id, arg.node_id: node_id, rp.node_id: node_id})
         return arg.node_id
 
+    def annex_operator(self, ancestor_id, op):
+        ancestor = self._nodes[ancestor_id]
+        assert isinstance(ancestor, ENode) and ancestor.has_children()
+
+        left = ENode()
+        op_node = OpNode(op)
+        right = ENode()
+
+        current_children = list(ancestor.get_children())
+        left.add_children(current_children)
+        ancestor.clear_children()
+        ancestor.add_children([left, op_node, right])
+
+        self._nodes[left.node_id] = left
+        self._nodes[op_node.node_id] = op_node
+        self._nodes[right.node_id] = right
+
+        self._parents[left.node_id] = ancestor_id
+        self._parents[op_node.node_id] = ancestor_id
+        self._parents[right.node_id] = ancestor_id
+        for child in current_children:
+            self._parents[child.node_id] = left.node_id
+
     def change_operator(self, op_node_id, new_op):
         node = self._nodes[op_node_id]
         assert isinstance(node, OpNode)
