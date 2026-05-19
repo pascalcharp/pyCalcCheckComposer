@@ -1,5 +1,34 @@
 # Journal de développement — pyCalcCheckComposer
 
+## Symboles Unicode pour les opérateurs booléens *(2026-05-19)*
+
+**Objectif :** Remplacer les lexèmes textuels (`and`, `or`, `impl`…) par leurs équivalents Unicode logiques, cohérents avec la notation LaTeX utilisée dans Overleaf.
+
+### Correspondances appliquées
+
+| Opérateur | Avant | Après |
+|---|---|---|
+| NOT | `not` | ¬ |
+| AND | `and` | ∧ |
+| OR | `or` | ∨ |
+| XOR | `^` | ⊕ |
+| IMPL | `impl` | ⇒ |
+| CONS | `cons` | ⇐ |
+| EQ | `eq` | ≡ |
+| NEQ | `neq` | ≢ |
+
+### Fichiers modifiés
+
+#### `BooleanExpression/Node/OpNode.py`
+- `BooleanOperators` : valeurs mises à jour avec les caractères Unicode.
+
+#### `gui/ENodeWidget.py`
+- `_ENODE_EXPANSIONS` remplacé par un calcul dynamique depuis `BooleanOperators` via `_enode_label(op_key)`, éliminant les labels codés en dur et garantissant la cohérence avec les nœuds en mode Display.
+
+**Test :** validation visuelle — nœuds Display et boutons Input affichent les mêmes symboles.
+
+---
+
 ## Compaction du mode Input *(2026-05-19)*
 
 **Objectif :** Réduire la disparité de taille entre le mode Display (bouton ~40 px) et le mode Input (grille de boutons), pour que l'utilisateur perçoive une transformation du nœud plutôt qu'une substitution par un nouveau widget.
