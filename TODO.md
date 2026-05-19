@@ -4,7 +4,7 @@
 
 | Priorité | Item                       | Raison                                                              |
 |----------|----------------------------|---------------------------------------------------------------------|
-| **P1**   | Compaction du mode Input   | Friction immédiate à chaque interaction ; affecte tous les nœuds    |
+| ~~P1~~   | ~~Compaction du mode Input~~   | ✅ Terminé                                                          |
 | **P1**   | Suggestions de variables   | Gain immédiat, périmètre réduit, aucune dépendance                  |
 | **P1**   | Extension / annexion       | Friction quotidienne élevée, périmètre contenu                      |
 | **P2**   | Hints entre expressions    | Structure sémantique centrale ; doit précéder la sérialisation      |

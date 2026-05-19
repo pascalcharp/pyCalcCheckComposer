@@ -1,5 +1,29 @@
 # Journal de développement — pyCalcCheckComposer
 
+## Compaction du mode Input *(2026-05-19)*
+
+**Objectif :** Réduire la disparité de taille entre le mode Display (bouton ~40 px) et le mode Input (grille de boutons), pour que l'utilisateur perçoive une transformation du nœud plutôt qu'une substitution par un nouveau widget.
+
+### Fichiers modifiés
+
+#### `gui/GuiConstants.py`
+- `NODE_INPUT_BUTTON_HEIGHT` : 35 → 22
+- `NODE_ACTION_BUTTON_WIDTH` : 30 → 22
+- `NODE_INPUT_LAYOUT_SPACING` : 4 → 2
+- `NODE_INPUT_CONTAINER_PADDING` : 4 → 2
+- Ajout de `ENODE_INPUT_GRID_COLUMNS = 5` (grille spécifique à `ENodeWidget`)
+- Ajout de `NODE_INPUT_FONT_SIZE = 10`
+- Ajout dans `APP_STYLESHEET` : `QWidget#nodeInput QPushButton { font-size: 10px; padding: 1px 2px; }`
+
+#### `gui/ENodeWidget.py`
+- Utilise `ENODE_INPUT_GRID_COLUMNS` (5 colonnes) au lieu de `NODE_INPUT_GRID_COLUMNS` (3).
+- `var_row` calculé par division plafond `(len + cols - 1) // cols` pour éviter le chevauchement avec la rangée texte quand la grille n'est pas divisible parfaitement.
+- Résultat : les 9 boutons d'opérateurs tiennent sur 2 rangées (5 + 4) au lieu de 3.
+
+**Test :** validation visuelle — le mode Input de `ENodeWidget`, `OpNodeWidget` et `IdNodeWidget` est nettement plus compact.
+
+---
+
 ## Étape 5 — Câblage de l'action au contrôleur *(2026-05-07)*
 
 **Objectif :** Connecter «Réduire en E» au modèle via le contrôleur, et vérifier que l'expression se collapse correctement.
