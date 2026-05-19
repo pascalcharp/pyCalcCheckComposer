@@ -1,18 +1,23 @@
 from PyQt6.QtWidgets import QWidget, QGridLayout, QPushButton, QLineEdit
+from BooleanExpression.Node.OpNode import BooleanOperators
 from gui.GuiConstants import GuiConstants
 from gui.NodeWidget import NodeWidget
 
-_ENODE_EXPANSIONS = [
-    ("NotOperator",           "not E"),
-    ("AndOperator",           "E and E"),
-    ("OrOperator",            "E or E"),
-    ("XorOperator",           "E ^ E"),
-    ("ImplicationOperator",   "E impl E"),
-    ("ConsequenceOperator",   "E cons E"),
-    ("EquivalentOperator",    "E eq E"),
-    ("NotEquivalentOperator", "E neq E"),
-    ("Leftparen",             "(E)"),
+_ENODE_EXPANSION_KEYS = [
+    "NotOperator", "AndOperator", "OrOperator", "XorOperator",
+    "ImplicationOperator", "ConsequenceOperator",
+    "EquivalentOperator", "NotEquivalentOperator", "Leftparen",
 ]
+
+def _enode_label(op_key):
+    sym = BooleanOperators[op_key].strip()
+    if op_key == "Leftparen":
+        return "(E)"
+    if op_key == "NotOperator":
+        return f"{sym} E"
+    return f"E {sym} E"
+
+_ENODE_EXPANSIONS = [(k, _enode_label(k)) for k in _ENODE_EXPANSION_KEYS]
 
 
 class ENodeWidget(NodeWidget):

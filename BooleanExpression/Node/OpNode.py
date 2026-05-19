@@ -2,14 +2,14 @@ from BooleanExpression.Node.TerminalNode import TerminalNode
 
 BooleanOperators = dict(Leftparen=" ( ",
                         Rightparen=" ) ",
-                        NotOperator=" not ",
-                        AndOperator=" and ",
-                        OrOperator=" or ",
-                        XorOperator=" ^ ",
-                        ImplicationOperator=" impl ",
-                        ConsequenceOperator=" cons ",
-                        EquivalentOperator=" eq ",
-                        NotEquivalentOperator=" neq ")
+                        NotOperator=" ¬ ",
+                        AndOperator=" ∧ ",
+                        OrOperator=" ∨ ",
+                        XorOperator=" ⊕ ",
+                        ImplicationOperator=" ⇒ ",
+                        ConsequenceOperator=" ⇐ ",
+                        EquivalentOperator=" ≡ ",
+                        NotEquivalentOperator=" ≢ ")
 
 class OpNode(TerminalNode):
     def __init__(self, op):
