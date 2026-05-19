@@ -2,7 +2,13 @@ from PyQt6.QtWidgets import QWidget, QHBoxLayout, QApplication, QMenu
 from PyQt6.QtCore import Qt, QEvent
 
 from BooleanExpression.Node.IdNode import IdNode
-from BooleanExpression.Node.OpNode import OpNode
+from BooleanExpression.Node.OpNode import OpNode, BooleanOperators
+
+_ANNEX_OPERATOR_ORDER = [
+    "AndOperator", "OrOperator", "XorOperator",
+    "ImplicationOperator", "ConsequenceOperator",
+    "EquivalentOperator", "NotEquivalentOperator",
+]
 from gui.ENodeWidget import ENodeWidget
 from gui.IdNodeWidget import IdNodeWidget
 from gui.OpNodeWidget import OpNodeWidget
@@ -25,6 +31,12 @@ class ExpressionWidget(QWidget):
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.Type.MouseButtonPress:
+            # Un popup Qt (ex. QCompleter, menu contextuel système) capture la souris ;
+            # laisser notre logique s'exécuter fermerait le widget actif avant que le
+            # popup ait livré sa sélection, causant un crash ou une perte de saisie.
+            if QApplication.activePopupWidget() is not None:
+                return False
+
             pos = event.globalPosition().toPoint()
 
             if event.button() == Qt.MouseButton.RightButton:
@@ -93,18 +105,48 @@ class ExpressionWidget(QWidget):
         if self._active_node_widget is not None and self._active_node_widget is not requesting_widget:
             self._active_node_widget.enter_display_mode()
         self._active_node_widget = requesting_widget
+        if isinstance(requesting_widget, ENodeWidget):
+            requesting_widget.set_variable_suggestions(
+                self.proof_window.controller.get_used_variables()
+            )
         requesting_widget.enter_input_mode()
 
     def _show_context_menu(self, global_pos):
         ancestor_id = self.tree.find_collapsible_ancestor(self._selected_node_ids)
+        enabled = ancestor_id is not None
         menu = QMenu(self)
+
         collapse_action = menu.addAction("Réduire en E")
-        collapse_action.setEnabled(ancestor_id is not None)
-        if menu.exec(global_pos) == collapse_action and ancestor_id is not None:
-            self._on_collapse_to_enode(ancestor_id)
+        collapse_action.setEnabled(enabled)
+        if enabled:
+            collapse_action.triggered.connect(
+                lambda: self._on_collapse_to_enode(ancestor_id)
+            )
+
+        paren_action = menu.addAction("Mettre entre parenthèses")
+        paren_action.setEnabled(enabled)
+        if enabled:
+            paren_action.triggered.connect(lambda: self._on_parenthesize(ancestor_id))
+
+        annex_menu = menu.addMenu("Annexer →")
+        annex_menu.setEnabled(enabled)
+        if enabled:
+            for op_key in _ANNEX_OPERATOR_ORDER:
+                action = annex_menu.addAction(BooleanOperators[op_key].strip())
+                action.triggered.connect(
+                    lambda _, k=op_key, a=ancestor_id: self._on_annex_operator(a, k)
+                )
+
+        menu.exec(global_pos)
 
     def _on_collapse_to_enode(self, ancestor_id):
         self.proof_window.controller.collapse_subtree(self.expression_index, ancestor_id)
+
+    def _on_parenthesize(self, ancestor_id):
+        self.proof_window.controller.parenthesize(self.expression_index, ancestor_id)
+
+    def _on_annex_operator(self, ancestor_id, op):
+        self.proof_window.controller.annex_operator(self.expression_index, ancestor_id, op)
 
     def _on_action_committed(self, node_widget, action, payload):
         self._active_node_widget = None
