@@ -41,11 +41,13 @@ class GuiConstants:
     # --- Famille NodeWidget ---
     ENODE_DISPLAY_BUTTON_SIZE   = 40
     NODE_DISPLAY_BUTTON_HEIGHT  = 40
-    NODE_INPUT_BUTTON_HEIGHT    = 35
-    NODE_ACTION_BUTTON_WIDTH    = 30
-    NODE_INPUT_LAYOUT_SPACING   = 4
-    NODE_INPUT_CONTAINER_PADDING = 4
+    NODE_INPUT_BUTTON_HEIGHT    = 22
+    NODE_ACTION_BUTTON_WIDTH    = 22
+    NODE_INPUT_LAYOUT_SPACING   = 2
+    NODE_INPUT_CONTAINER_PADDING = 2
     NODE_INPUT_GRID_COLUMNS     = 3
+    ENODE_INPUT_GRID_COLUMNS    = 5
+    NODE_INPUT_FONT_SIZE        = 10
 
     # --- Stylesheet globale (appliquée sur QApplication, base Fusion) ---
     # Les doubles accolades {{ }} sont des accolades CSS littérales dans un f-string.
@@ -77,5 +79,9 @@ class GuiConstants:
         f"  border: 2px solid {NODE_INPUT_BORDER_COLOR};"
         f"  border-radius: 6px;"
         f"  background-color: {NODE_INPUT_BACKGROUND_COLOR};"
+        f"}}"
+        f"QWidget#nodeInput QPushButton {{"
+        f"  font-size: {NODE_INPUT_FONT_SIZE}px;"
+        f"  padding: 1px 2px;"
         f"}}"
     )

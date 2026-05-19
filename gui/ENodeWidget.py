@@ -30,7 +30,7 @@ class ENodeWidget(NodeWidget):
     def _build_input_widget(self) -> QWidget:
         container = QWidget()
         p = GuiConstants.NODE_INPUT_CONTAINER_PADDING
-        cols = GuiConstants.NODE_INPUT_GRID_COLUMNS
+        cols = GuiConstants.ENODE_INPUT_GRID_COLUMNS
         layout = QGridLayout()
         layout.setContentsMargins(p, p, p, p)
         layout.setSpacing(GuiConstants.NODE_INPUT_LAYOUT_SPACING)
@@ -43,7 +43,7 @@ class ENodeWidget(NodeWidget):
             self._op_buttons[op_key] = btn
             layout.addWidget(btn, i // cols, i % cols)
 
-        var_row = len(_ENODE_EXPANSIONS) // cols
+        var_row = (len(_ENODE_EXPANSIONS) + cols - 1) // cols
         self._var_input = QLineEdit()
         self._var_input.setPlaceholderText("variable")
         self._var_input.returnPressed.connect(self._on_var_confirmed)

@@ -4,12 +4,34 @@
 
 | Priorité | Item                       | Raison                                                              |
 |----------|----------------------------|---------------------------------------------------------------------|
+| **P1**   | Compaction du mode Input   | Friction immédiate à chaque interaction ; affecte tous les nœuds    |
 | **P1**   | Suggestions de variables   | Gain immédiat, périmètre réduit, aucune dépendance                  |
 | **P1**   | Extension / annexion       | Friction quotidienne élevée, périmètre contenu                      |
 | **P2**   | Hints entre expressions    | Structure sémantique centrale ; doit précéder la sérialisation      |
 | **P2**   | Menu + gestion de preuve   | Nécessite que les hints soient définis pour la sérialisation complète |
 | **P3**   | Undo / Redo                | Mieux fait quand toutes les opérations sont stables                 |
 | **P3**   | Sélection par rectangle    | Amélioration UX ; le ⌘+clic est fonctionnel en attendant            |
+
+---
+
+## P1 — Compaction du mode Input (réduction du choc visuel)
+
+En mode Input, les widgets (`ENodeWidget`, `OpNodeWidget`, `IdNodeWidget`) sont beaucoup plus grands que leur équivalent Display. Ce saut de taille est désorientant : l'utilisateur a l'impression qu'un nouveau widget a explosé à l'écran plutôt que le même nœud a changé d'état.
+
+**Objectif :** réduire au maximum la taille du mode Input par compaction inline (approche A), sans supprimer de fonctionnalité.
+
+**Leviers de compaction envisagés :**
+- Réduire la taille des boutons d'opérateurs (`NODE_INPUT_BUTTON_HEIGHT`, largeur).
+- Réduire les marges et espacements internes (`NODE_INPUT_LAYOUT_SPACING`).
+- Réduire la taille de police des boutons (via `GuiConstants` / `APP_STYLESHEET`).
+- Limiter la largeur du champ texte variable au strict nécessaire.
+
+**Critère de succès :** après le clic sur un nœud, le widget input occupe une surface proche de celle du widget display — l'utilisateur perçoit une transformation, pas une substitution.
+
+**Travail requis :**
+- Ajuster les constantes dans `gui/GuiConstants.py`.
+- Vérifier visuellement sur `ENodeWidget`, `OpNodeWidget` et `IdNodeWidget`.
+- Aucun test automatisé requis (validation visuelle suffisante).
 
 ---
 
